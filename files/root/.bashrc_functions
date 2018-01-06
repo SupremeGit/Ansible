@@ -40,10 +40,17 @@ function find_functions_used_by_aliases () {
     done
 }
 
-function jj-gitseturl {
+function jj-git-seturl {
     git remote set-url origin \"git@github.com:SupremeGit/$1.git\"
 }
-
+function jj-git-clean-history {
+    git checkout --orphan latest_branch
+    git add -A
+    git commit -am "Cleaning git history. Version 1.0 can start here."
+    git branch -D master
+    git branch -m master
+    git push -f origin master
+}
 #sngle-line functions must have ; after last statement:
 function jj-diff-sbs () { diff --suppress-common-lines --side-by-side --ignore-space-change "$@" ; }
 function jj-diff-sbs-spaces () { diff --suppress-common-lines --side-by-side "$@" ; 

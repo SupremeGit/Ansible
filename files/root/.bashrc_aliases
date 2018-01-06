@@ -410,7 +410,8 @@ alias jj-firewalld-permanent-port-add-fedoraws="firewall-cmd --permanent --zone=
 alias aliasA="functionC"           #aliasA is used by functionB, defined before functionC. Wow. It works.
 alias check_aliastest="aliastest"  #check_aliastest references function aliastest defined later. Works.
 
-for i in ~/.bashrc_jss ~/.bashrc_functions ; do 
+for i in ~/.bashrc_jss ~/.bashrc_functions ~/.bashrc_ansible; do 
+#for i in ~/.bashrc_jss ~/.bashrc_functions ; do 
     if [[ -e "${i}" ]] ; then 
 	#echo "Sourcing ${i}"
 	source "${i}" 
