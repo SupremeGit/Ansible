@@ -1,0 +1,14 @@
+[puppet5]
+name=Puppet 5 Repository fedora $releasever - $basearch
+baseurl=http://yum.puppetlabs.com/puppet5/fedora/$releasever/$basearch
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-puppet5
+enabled=1
+gpgcheck=1
+
+[puppet5-source]
+name=Puppet 5 Repository fedora $releasever - Source
+baseurl=http://yum.puppetlabs.com/puppet5-nightly/fedora/$releasever/SRPMS
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-puppet5
+failovermethod=priority
+enabled=0
+gpgcheck=1

@@ -1,0 +1,85 @@
+
+[dummy]
+balls
+
+[aws]
+homunculoid.com ansible_ssh_user=bitnami ansible_ssh_private_key_file='/home/jss/.ssh/wp01.pem'
+
+[f17]
+dali
+
+[f23]
+t1
+t2
+
+[f27]
+il-duce
+putin.default.vorpal ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+fedora.soe.vorpal ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+[fedora-rawhide]
+rawhide
+rawhide.soe.vorpal ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+[centos7]
+t3
+voltaire
+centos7.soe.vorpal ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+temp.soe.vorpal  ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+foo.soe.vorpal  ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+bar.soe.vorpal  ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+[soe]
+fedora.soe.vorpal ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+fedora26.soe.vorpal ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+rawhide.soe.vorpal ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+centos7.soe.vorpal ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+temp.soe.vorpal  ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+foo.soe.vorpal  ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+bar.soe.vorpal  ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+ubuntu.soe.vorpal  ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+ubuntu_server.soe.vorpal  ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+[ubuntu]
+bustard.default.vorpal ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+ubuntu.soe.vorpal  ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+ubuntu_server.soe.vorpal  ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+[linux:children]
+f17
+f23
+f27
+fedora-rawhide
+centos7
+soe
+ubuntu
+
+[vms]
+putin.default.vorpal ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+voltaire
+rawhide
+bustard.default.vorpal ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+[win]
+boudoir
+
+[iot]
+fuji
+
+[droid]
+mobster
+
+[osx]
+
+[ios]
+
+[network]
+linksys
+
+[vorpal:children]
+win
+linux
+osx
+droid
+ios
+network

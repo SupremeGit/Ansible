@@ -1,0 +1,902 @@
+
+# User specific aliases and functions
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+
+#----------------------------------------------------------------------------
+#basic, general purpose aliases:
+#
+alias h=history
+alias sbrc="source ~/.bashrc"
+alias ebrc="emacs ~/.bashrc"
+alias sba="source ~/.bashrc_aliases"
+alias eba="emacs ~/.bashrc_aliases"
+alias sbp="source ~/.bashrc_passwords"
+alias ebp="emacs ~/.bashrc_passwords"
+
+alias l='ls $LS_OPTIONS -lA'
+alias ll='ls $LS_OPTIONS -l'
+alias lla="ls $LS_OPTIONS -la"
+alias llr="ls $LS_OPTIONS -lR"
+alias llar="ls $LS_OPTIONS -laR"
+alias lh='ls $LS_OPTIONS -lAh'
+alias llh='ls $LS_OPTIONS -lh'
+alias llah="ls $LS_OPTIONS -lah"
+alias llrh="ls $LS_OPTIONS -lRh"
+alias llarh="ls $LS_OPTIONS -laRh"
+
+alias jj-cbrc="cat ~/.bashrc"
+alias jj-ebrc="emacs ~/.bashrc"
+alias jj-sbrc="source ~/.bashrc"
+alias jj-vbrc="vim ~/.bashrc"
+alias jj-vibrc="vi ~/.bashrc"
+alias jj-sba="source ~/.bashrc_aliases"
+alias jj-eba="emacs ~/.bashrc_aliases"
+alias jj-eh="emacs /etc/hosts"
+alias jj-ch="cat /etc/hosts"
+alias jj-gh="cat /etc/hosts | grep"
+alias jj-cnotes="cat ~/notes.txt"
+alias jj-enotes="emacs ~/notes.txt"
+alias jj-t100="tail -n 100"
+alias jj-t1000="tail -n 1000"
+alias jj-agrep="alias | sort | grep -i"
+alias jj-asort="alias | sort"
+alias jj-psgrep="ps -ef | grep -i"
+alias jj-envgrep="env | grep -i"
+alias jj-find="find . -iname"
+function jj-finddir () {
+   dir="$1" ; shift
+   find "${dir}" -iname "$@"
+}
+#alias jj-clean="find . -iname *~ -print -delete"  #use jj-cleandir .
+function jj-cleandir () {
+   dir="$1" ; shift
+   find "${dir}" -iname *~ -print -delete
+}
+function jj-grep-ir () {
+#grep is so goddamned annoying, with search pattern first and directory last.
+#It's arse-backwards.
+#Here, we fix it so we can specify directory first, pattern last:
+   dir="$1" ; shift
+   grep -ir "$@" "${dir}" 
+}
+
+
+alias jj-emacs-EDITOR-no-window="export EDITOR=emacs -nw"
+alias jj-emacs-no-window="emacs -nw"
+alias jj-emacs-no-colors="emacs --color=never"
+alias jj-emacs-set-no-colors="alias emacs=\"emacs --color=never\""
+
+alias jj-dbrc="diff /root/.bashrc /home/jss/.bashrc"
+alias jj-diff-sbs="diff --suppress-common-lines --side-by-side --ignore-space-change"
+alias jj-diff-sbs-spaces="diff --suppress-common-lines --side-by-side"
+alias jj-diff-sbs-all="diff --side-by-side"
+
+alias jj-brc-jss_from_root="/bin/cp -f /root/.bashrc /home/jss/.bashrc ; chown jss.jss /home/jss/"
+alias jj-aliases-jss_from_root="/bin/cp -f /root/.bashrc_aliases /home/jss/.bashrc_aliases ; chown jss.jss /home/jss/"
+
+alias jj-brc-u_root_from_jss="cp -f /home/jss/.bashrc /root/.bashrc ; chown root.root /root/"
+alias jj-brc-u_root_sudo_from_jss="sudo /usr/local/bin/update-root-bashrc.sh"
+alias jj-brc-u_ovirt_from_root="/bin/scp /root/.bashrc ovirt-engine-host:/root/"
+alias jj-sudo="sudo -H"
+
+alias jj-chown="chown jss"
+alias jj-chowng="chown jss.jss"
+alias jj-chgrp="chgrp jss"
+
+alias jj-uchmod="chmod u+rwX"
+alias jj-gchmod="chmod g+rwX"
+alias jj-ugchmod="chmod ug+rwX"
+alias jj-achmod="chmod a+rwX"
+
+alias jj-rchown="chown -Rf jss"
+alias jj-rchowng="chown -Rf jss.jss"
+alias jj-rchgrp="chgrp -Rf jss"
+
+alias jj-urchmod="chmod -Rf u+rwX"
+alias jj-grchmod="chmod -Rf g+rwX"
+alias jj-ugrchmod="chmod -Rf ug+rwX"
+alias jj-archmod="chmod -Rf a+rwX"
+
+alias jj-dus="du -hxs"
+alias jj-du1="du -hx --max-depth=1"
+alias jj-du2="du -hx --max-depth=2"
+alias jj-du3="du -hx --max-depth=3"
+alias jj-cpsparse="cp --sparse=always"
+
+var_github_dir="/data-ssd/data/development/src/github/"
+alias jj-cd-github="cd \"${var_github_dir}\""
+alias jj-gs='git status '
+alias jj-ga='git add '
+alias jj-gb='git branch '
+alias jj-gc='git commit'
+alias jj-gd='git diff'
+alias jj-go='git checkout '
+alias jj-gk='gitk --all&'
+alias jj-gx='gitx --all'
+alias jj-gpush="git push origin master"  #push updates to repo
+alias jj-gpull="git pull origin master"  #pull updates from repo
+alias jj-git-tags="git tag"
+alias jj-git-branches-local="git branch"
+alias jj-git-branches-remote="git branch -r"
+alias jj-git-branches-all="git branch -a"
+
+function jj-gitseturl {
+    git remote set-url origin \"git@github.com:SupremeGit/$1.git\"
+}
+alias got='git '
+alias get='git '
+
+alias jj-git-clean="git clean -d -x -f"
+alias jj-git-clean-dryrun="git clean -d -x -n"
+alias jj-git-stash="git stash -u"
+alias jj-git-stash-list="git stash list"
+alias jj-git-stash-show="git stash show"
+alias jj-git-stash-clear="git stash clear"
+alias jj-git-stash-pop="git stash pop"
+
+#git stash list [<options>]
+#git stash show [<stash>]
+#git stash drop [-q|--quiet] [<stash>]
+#git stash ( pop | apply ) [--index] [-q|--quiet] [<stash>]
+#git stash branch <branchname> [<stash>]
+#git stash save [-p|--patch] [-k|--[no-]keep-index] [-q|--quiet]
+#               [-u|--include-untracked] [-a|--all] [<message>]
+#git stash [push [-p|--patch] [-k|--[no-]keep-index] [-q|--quiet]
+#               [-u|--include-untracked] [-a|--all] [-m|--message <message>]]
+#               [--] [<pathspec>...]]
+#git stash clear
+#git stash create [<message>]
+#git stash store [-m|--message <message>] [-q|--quiet] <commit>
+
+alias jj-fbd="dolphin > /dev/null 2>&1"
+alias jj-fbt="thunar > /dev/null 2>&1"
+alias jj-vm="virt-manager"
+alias jj-freboot="reboot --force"
+alias jj-fhalt="poweroff --force"
+
+alias jj-chrome="/usr/bin/google-chrome-stable --password-store=basic"
+
+alias jj-switch-dm="system-switch-displaymanager"
+
+#Systemd:
+alias jj-services="kcmshell5 kcm_systemd"
+alias jj-sc-suspend="systemctl suspend"
+alias jj-sc-hibernate="systemctl hibernate"
+alias jj-sysls="systemd-cgls"
+alias jj-sc-sysdebug="systemctl enable debug-shell.service"
+alias jj-sc-debugoff="systemctl disable debug-shell.service"
+alias jj-sc-services="systemctl list-unit-files --type=service"
+alias jj-sc-reload="systemctl daemon-reload"
+alias jj-sc-timers="systemctl list-timers --all"
+alias jj-sc-status="systemctl status "
+alias jj-sc-stop="systemctl stop "
+alias jj-sc-enable="systemctl enable "
+alias jj-sc-disable="systemctl disable "
+alias jj-sc-mask="systemctl mask "
+
+function jj-sc-operation-status () {
+   operation="$1" ; shift
+   service="$1" ; shift
+   systemctl "$operation" "$service"
+   systemctl status "$service"
+}
+
+alias jj-sc-start="jj-sc-operation-status start"
+alias jj-sc-restart="jj-sc-operation-status restart"
+
+alias jj-sc-user-services="systemctl --user list-unit-files --type=service"
+alias jj-sc-user-status="systemctl --user status"
+
+#find /etc/ -iname *.service | grep vnc
+#/etc/systemd/system/vncserver-1080p@.service
+#/etc/systemd/system/vncserver-1000x660@.service
+#/etc/systemd/system/vncserver@.service
+#/etc/systemd/system/multi-user.target.wants/vncserver@:12.service
+#/etc/systemd/system/multi-user.target.wants/vncserver-1000x660@:13.service
+#/etc/systemd/system/multi-user.target.wants/vncserver-1080p@:14.service
+
+#loginctl:
+alias jj-loginls="loginctl list-sessions"
+alias jj-loginshows="loginctl show-session"     #followed by ID  #shows brief summary
+alias jj-loginstatus="loginctl session-status"  #followed by ID  #shows full tree
+#When I just log out, I can manually stop the systemd user session using:
+#loginctl kill-user/kill-session
+#(I am not sure which one I used last time), which will terminate user bus and all the other services from that session.
+
+#Journalctl:
+#/etc/systemd/journald.conf
+#SystemMaxUse=200M
+alias jj-jc-du="journalctl --disk-usage"
+alias jj-jc-rotate="journalctl --rotate"
+alias jj-jc-verify="journalctl --verify"          #check for corrupt journals
+alias jj-jc-clean="journalctl --vacuum-size=200M"
+alias jj-jc-restart="systemctl restart systemd-journald.service"
+
+
+alias jj-jc="journalctl -xe"                      #last 1000 messages in journal
+alias jj-jc-error="journalctl -u "                #followed by service name eg smb
+
+alias jj-jc-dmesg="journalctl --dmesg"
+alias jj-jc-boot-list="journalctl --list-boots"
+alias jj-jc-boot-last="journalctl --boot=-1"      #last boot
+alias jj-jc-boot-current="journalctl  --boot=0"   #current boot
+alias jj-jc-boot-n="journalctl  --boot="          #jbc-10 gives -10th boot #this wont work
+
+alias jj-sc-bootgrep="jj-jc-boot-current | grep -ve pulseaudio -ve dbus -ve audit -ve gdm-x-session -ve nagios -ive NetworkManager -ve dnsmasq -ve grafana -ve com.redhat -ve influxd -ve smart -ve 'system activity accounting tool' -ve sshd -ve chronyd -ve run-parts -ve nm-dispatcher "
+
+alias jj-jc-sys="journalctl --reverse --system"
+alias jj-jc-user="journalctl --reverse --user"    #use as jss
+
+#crap
+alias jj-jc-lc-status="loginctl session-status"
+alias jj-jc-jss="journalctl --user-unit=jss"     #gives nothing, even when logged in as jss
+#alias jj-jc="journalctl "
+
+
+alias jj-hostnamectl-set-hostname="hostnamectl set-hostname"
+
+#----------------------------------------------------------------------------
+#yum/dnf:
+
+#ubuntu
+#alias pkg-list-all="dpkg-query --list"
+#alias pkg-filesbypkg="dpkg -L"
+#alias pkg-whatprovides="dpkg -S"
+
+#el/fedora
+#alias yumd="yum --disablerepo=*"
+#alias yumall="yum --enablerepo=*"
+#el6:
+#alias yumbup="yum --disablerepo=* --enablerepo=base,updates"
+#alias yumbupel="yum --disablerepo=* --enablerepo=base,updates,epel"
+#el7
+#alias dnfbup="dnf --disablerepo=* --enablerepo=base --enablerepo=updates"
+#alias dnfbupel="dnf --disablerepo=* --enablerepo=base --enablerepo=updates --enablerepo=epel"
+#fc17
+#alias yumfup="yum --disablerepo=* --enablerepo=fedora,updates"
+#alias yumfupr="yum --disablerepo=* --enablerepo=fedora,updates,rpmfusion-free,rpmfusion-nonfree"
+#alias yumrpmfusion="yum --disablerepo=* --enablerepo=rpmfusion*"
+
+alias jj-yumlist="cat ~/zz_yum/yum.all.txt"
+alias jj-yumgrep="cat ~/zz_yum/yum.all.txt | grep"
+
+#fc24
+alias jj-dnffupr="dnf --disablerepo=* --enablerepo=fedora --enablerepo=updates --enablerepo=rpmfusion-free --enablerepo=rpmfusion-nonfree"
+alias jj-dnffup="dnf --disablerepo=* --enablerepo=fedora --enablerepo=updates"
+
+alias jj-dnfprovides="dnf provides"
+alias jj-dnfprovidesall="dnf enablerepo=* provides"
+
+alias jj-rpm-files="rpm -q --filesbypkg"
+alias jj-rpm-wp="rpm -q --whatprovides"
+
+#alias dnfls='dnf list available | tr "\n" "#" | sed -e 's/# / /g' | tr "#" "\n" | sort'
+function jj-dnf-list {
+    dnf $@ list available | tr "\n" "#" | sed -e 's/# / /g' | tr "#" "\n" | sort --general-numeric-sort
+}
+function jj-dnf-ls {
+    dnf $@ list available | tr "\n" "#" | sed -e 's/# / /g' | tr "#" "\n" | sort --general-numeric-sort
+}
+
+function jj-dnf-unwrap {
+    dnf $@ | tr "\n" "#" | sed -e 's/# / /g' | tr "#" "\n"
+}
+
+function dnfsort {
+    dnf $@ | tr "\n" "#" | sed -e 's/# / /g' | tr "#" "\n" | sort --general-numeric-sort
+}
+
+function jj-dnf-sqsort {
+    dnf $@ | tr "\n" "#" | sed -e 's/# / /g' | tr "#" "\n" | tr --squeeze-repeats [:blank:] | sort --general-numeric-sort
+}
+
+function jj-joinsort {
+    tr "\n" "#" | sed -e 's/# / /g' | tr "#" "\n" | sort --general-numeric-sort
+}
+
+alias jj-dnf-repos="dnf repolist             #list enabled repositories"
+alias jj-dnf-drepos="dnf repolist disabled"
+
+function jj-dnf-lskernel {
+    repos=""
+    for i in kernel-vanilla-fedora kernel-vanilla-stable kernel-vanilla-stable-rc kernel-vanilla-mainline jforbes-kernel-stabilization rawhide ; do
+	repos+="--enablerepo=$i "
+    done
+    cmd="dnf $repos --showduplicates list kernel"
+    echo cmd="$cmd"
+    $cmd
+}
+
+#list files in a package in repo
+alias jj-dnf-filesypkg="dnf repoquery --list"  #--enablerepo=updates 
+
+#----------------------------------------------------------------------------
+#ssh commands:
+
+#root:
+alias jj-ssh-dali="ssh -X root@dali"
+alias jj-ssh-dali-nox="ssh root@dali"
+alias jj-ssh-rawhide="ssh -X root@rawhide"
+#alias jj-ssh-putin="ssh -X root@putin"
+alias jj-ssh-putin="ssh -X -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@putin.soe.vorpal"
+alias jj-ssh-voltaire="ssh -X root@voltaire"
+alias jj-ssh-centos-soe="ssh -X -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@centos-soe.soe.vorpal"
+alias jj-ssh-bustard="ssh -X root@bustard.default.vorpal"
+alias jj-ssh-ovirt-eh="ssh -X root@ovirt-engine-host"
+alias jj-ssh-ovirt-e="ssh -X root@ovirt-engine"
+alias jj-ssh-ovirt-01="ssh -X root@ovirt-host-01"
+alias jj-ssn-ovirt-01="ssh -X root@ovirt-node-01"
+
+#jss
+alias jj-jssh-dali="ssh -X jss@dali"
+alias jj-jssh-dali-nox="ssh jss@dali"
+alias jj-jssh-rawhide="ssh -X jss@rawhide"
+#alias jj-jssh-putin="ssh -X jss@putin"
+alias jj-jssh-putin="ssh -X -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null jss@putin.soe.vorpal"
+alias jj-jssh-voltaire="ssh -X jss@voltaire"
+alias jj-jssh-centos-soe="ssh -X -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null jss@centos-soe.soe.vorpal"
+alias jj-jssh-bustard="ssh -X root@bustard.default.vorpal"
+
+#others:
+alias jj-ssh-homunculoid="ssh -i ~/.ssh/wp01.pem bitnami@homunculoid.com"
+alias jj-vnc-boudoir-scaled="/home/jss/src/ssvnc/bin/Linux.x86_64/vncviewer -scale auto boudoir"
+
+#----------------------------------------------------------------------------
+#il-duce:
+#
+#alias jj-reboot="/usr/local/bin/pre-reboot.sh | sudo /bin/bash -i"
+
+alias jj-vnc-fix="rm /tmp/.X1-lock /tmp/.X11-unix/X1"
+alias jj-vnc-restart="systemctl restart vncserver@:2.service"
+alias jj-nvidia-fix-video="nvidia-settings --assign CurrentMetaMode=\"HDMI-0: 1920x1080+0+0 { ForceCompositionPipeline = On }\""
+
+#current vnc services. Seems impopssible to get systemctl to list these with their instance names:
+#vncserver@:12.service
+#vncserver-1000x660@:13.service
+#vncserver-1080p@:14.service
+
+
+#----------------------------------------------------------------------------
+#vms:
+
+alias jj-transfer="scp -r il-duce:///mnt/6tb/data/kvm/transfer /data/"
+alias jj-bupdate="cp -a /data/transfer/filesystem/root/bashrc.root ~/.bashrc"
+alias jj-hostsupdate="cp -a /data/transfer/filesystem/etc/hosts /etc/"
+alias jj-tb-update="cp ~/.bashrc /mnt/6tb/data/kvm/transfer/filesystem/root/bashrc.root"
+alias jj-hostsupdate="cp /etc/hosts /mnt/6tb/data/kvm/transfer/filesystem/etc/"
+
+alias jj-qemu-disk-create="qemu-img create -f qcow2" #foobar.qcow2 #50G
+
+#----------------------------------------------------------------------------
+#Dev
+
+#VTK vars set in /etc/profile.d/vtk.sh
+alias jj-vtk="$VTK_DIR/bin/vtk"
+alias jj-vtk-python="$VTK_DIR/bin/vtkpython"
+
+#----------------------------------------------------------------------------
+#Aliases for jss
+
+#if you log in to vt1, you can start new X with audio priveleges by ensuring X attaches to the same terminal, using vtX switch to startx:
+#alias jj-xq3="startx -- -layout AOC -config xorg.conf.serverlayouts :2 vt1"
+alias jj-xq3="startx -- -layout BenQ-HDMI -config xorg.conf.serverlayouts :2 vt1"
+#startx uses ~/.xinitrc of the user
+
+alias jj-xq3vt2="startx -- -layout BenQ -config xorg.conf.serverlayouts :2 vt2"
+alias jj-xq3vt2_noAOC="startx -- -layout BenQ-HDMI -config xorg.conf.serverlayouts :2 vt2"
+alias jj-xq3vt2_HDMI="startx -- -layout HDMI -config xorg.conf.serverlayouts :2 vt2"
+
+alias jj-xdesk="startx -- -config xorg.desk.conf > xorg.desk.log 2>&1"
+
+alias jj-amarok_env="export KDEDIR=/home/jss/kde/ ; export KDEDIRS=/home/jss/kde/"
+alias jj-amarok_ccmake="cmake -DCMAKE_INSTALL_PREFIX=$HOME/kde -DCMAKE_BUILD_TYPE=debugfull -DWITH_MP4=ON -DWITH_ASF=ON /usr/local/src/amarok/amarok" #then make install.
+
+alias jj-q3-ut4="/usr/local/bin/jss/start_ut4.sh"
+alias jj-q3-ut4-server="/usr/local/bin/jss/start_ut4-server.sh"
+
+alias jj-q3="/usr/local/bin/jss/start_quake.sh"
+alias jj-q3-server="/usr/local/bin/jss/start_q3-server.sh"
+
+alias jj-q3-osp="/usr/local/bin/jss/start_quake_osp.sh"
+alias jj-q3-osp-server="/usr/local/bin/jss/start_q3-osp-server.sh" 
+
+alias jj-q3-cpma="/usr/local/bin/jss/start_quake_cpma.sh"
+alias jj-q3-cpma-server="/usr/local/bin/jss/start_q3-cpma-server.sh"
+
+alias jj-pulse-fix="/usr/local/bin/jss/restart-pulseaudio.sh"
+
+#fix these to use find:
+alias jj-eq3="emacs ~/z_links/q3a/*"
+alias jj-eos="emacs ~/z_links/os/*"
+alias jj-ejss="emacs ~/z_links/jss/*"
+
+#----------------------------------------------------------------------------
+#alias jj-kernel-stable="grub2-set-default 'Fedora (4.9.10-200.fc25.x86_64) 25 (Workstation Edition)'"
+alias jj-kernel-stable="grub2-set-default 'Fedora (4.9.13-201.fc25.x86_64) 25 (Workstation Edition)'"
+alias jj-kernel-4.10="grub2-set-default 'Fedora (4.10.1-1.vanilla.knurd.1.fc25.x86_64) 25 (Workstation Edition)'"
+alias jj-kernel-4.11="grub2-set-default 'Fedora (4.11.0-0.rc1.git1.2.vanilla.knurd.1.fc25.x86_64) 25 (Workstation Edition)'"
+
+#----------------------------------------------------------------------------
+#docker:
+#config file: ~/.docker/config.json
+#shit stored in /var/lib/docker
+##cd /data-ssd/data/development/os/docker/
+
+alias jj-docker-config="emacs ~/.docker/config.json"
+alias jj-docker-info="docker info"
+alias jj-docker-imagaes="docker images"
+alias jj-docker-cls="docker container ls"          #lists running containerids, same as "docker ps"
+alias jj-docker-clsq="docker container ls -q"      #no info, only containerids
+alias jj-docker-cps="docker ps"                    #lists running containerids, same as "docker container ls"
+
+alias jj-docker-login="docker login docker.io"     #details in passwd file
+alias jj-docker-push="docker push:"                #docker.io/biggusdockus/quantum:part2
+
+alias jj-docker-cbuild="docker build -t"           #friendlyhello
+alias jj-docker-crun="docker run -d"               #-d = daemon, in background   #-p 4000:80 friendlyhello
+alias jj-docker-cstop="docker container stop"      #containerid
+
+alias jj-docker-ctag="docker tag"                  #friendlyhello docker.io/biggusdockus/quantum:part2
+alias jj-docker-crmi="docker rmi"                  #biggusdockus/quantum:part2
+
+alias jj-docker-swarm="docker swarm init"
+alias jj-docker-sdeploy="docker stack deploy -c "        #docker-compose.yml getstartedlab
+alias jj-docker-sterm="docker stack rm"                  #getstartedlab     #terminate app
+alias jj-docker-sjoin="docker swarm join"                #join other machines to an existing swarm
+alias jj-docker-swarmleave="docker swarm leave --force"  #terminate the swarm
+
+alias jj-docker-sls="docker service ls"
+alias jj-docker-sps="docker service ps"            #getstartedlab_web
+
+alias jj-docker-vmcreate="docker-machine create --driver virtualbox"     #myvm1
+alias jj-docker-vmls="docker-machine ls"
+
+#ssh : example: start swarm manager on vm
+alias jj-docker-vmssh="docker-machine ssh "        #myvm1 "docker swarm init --advertise-addr <myvm1 ip>"
+
+#tell 2nd vm to join swarm:
+#docker-machine ssh myvm2 "docker swarm join --token <token> <ip>:2377"
+
+alias jj-docker-nls="docker node ls"              #list nodes (vms) in a swarm
+
+#############################################################################
+#----------------------------------------------------------------------------
+#ansible:
+export ANSIBLE_DEBUG=0
+#export ANSIBLE_DEBUG=1
+
+alias jj-vault="ansible-vault --vault-password-file ~/.ansible_vault_password"
+alias jj-ansible-vault-create="jj-vault create"
+alias jj-ansible-vault-encrypt="jj-vault encrypt"
+alias jj-ansible-vault-decrypt="jj-vault decrypt"
+alias jj-ansible-vault-edit="jj-vault edit"
+alias jj-ansible-vault-view="jj-vault view"
+alias jj-ansible-vault-passwd-change="jj-vault rekey"
+alias jj-ansible-vault-encrypt-string="jj-vault encrypt_string --name"
+alias jj-ansible-vault-edit-myvault="jj-ansible-vault-edit /etc/ansible/vars/vault.yml"
+
+alias jj-ansible-debug-on="export ANSIBLE_DEBUG=1"
+alias jj-ansible-debug-off="export ANSIBLE_DEBUG=0"
+
+var_ansible_files_dir=/data-ssd/data/development/os/ansible/ansible/files
+alias jj-aliases-ansible-root_from_root="/bin/cp -f /root/.bashrc_aliases \"${var_ansible_files_dir}/root/\""
+alias jj-aliases-ansible-jss_from_root="/bin/cp -f /root/.bashrc_aliases \"${var_ansible_files_dir}/jss/\""
+alias jj-aliases-ansible-bitnami_from_root="/bin/cp -f /root/.bashrc_aliases \"${var_ansible_files_dir}/bitnami/\""
+
+alias jj-brc-ansible-root_from_root="/bin/cp -f /root/.bashrc \"${var_ansible_files_dir}/root/\""
+alias jj-brc-ansible-jss_from_root="/bin/cp -f /root/.bashrc \"${var_ansible_files_dir}/jss/\""
+
+#gather facts:
+alias jj-ansible-facts="ansible -m setup"   #'homunculoid.com' 
+
+#vars:
+var_hg_aws="--extra-vars 'hostgroups=aws'"                           #${var_hg_aws}
+var_hg_vms="--extra-vars 'hostgroups=vms'"                           #${var_hg_vms}
+var_hg_soe="--extra-vars 'hostgroups=soe'"             		     #${var_hg_soe}
+var_hg_ubuntu="--extra-vars 'hostgroups=ubuntu'"            	     #${var_hg_ubuntu}
+var_hg_all="--extra-vars 'hostgroups=all'"		  	     #${var_hg_all}
+var_hg_all_nofacts="--extra-vars 'hostgroups=all facts_on=no'"       #${var_hg_all_nofacts}
+
+var_playbook_soe="/etc/ansible/playbooks/soe.yml"    	             #${var_playbook_soe}
+var_playbook_setup="/etc/ansible/playbooks/setup-host.yml"           #${var_playbook_setup}
+var_playbook_connect="/etc/ansible/playbooks/connect-host.yml"       #${var_playbook_connect}
+var_playbook_puppet_start="/etc/ansible/playbooks/connect-host.yml"  #${var_playbook_puppet_start}
+var_playbook_puppet_stop="/etc/ansible/playbooks/connect-host.yml"   #${var_playbook_puppet_stop}
+
+var_il_duce="--limit 'il-duce' --extra-vars 'hostgroups=f27'"        #${var_il_duce}
+var_homunculoid="${var_aws} --limit 'homunculoid.com'"               #${var_homunculoid}
+#--extra-vars 'hostgroups=aws ansible_ssh_user=bitnami' --private-key '/home/jss/.ssh/wp01.pem'
+
+var_voltaire="${var_vms} --limit 'voltaire'"                         #${var_voltaire}
+#var_putin="${var_vms} --limit 'putin'"                              #${var_putin}
+var_putin="${var_vms} --limit 'putin.soe.vorpal'"                    #${var_putin}
+var_rawhide="${var_vms} --limit 'rawhide'"                           #${var_rawhide}
+var_centos_soe="${var_hg_soe} --limit 'centos-soe.soe.vorpal'"       #${var_centos_soe}
+var_bustard="${var_hg_ubuntu} --limit 'bustard.default.vorpal'"      #${var_bustard}
+
+################
+#Build some useful aliases:
+
+#include hosts file:
+alias jj-ansible-hosts="ansible-playbook -i /etc/ansible/hosts"
+alias jj-ansible-hosts-check="jj-ansible-hosts --check"
+
+#all hostgroups:
+alias jj-ansible-hosts-hostgroups-all="jj-ansible-hosts ${var_hg_all}"
+#alias jj-ansible-hosts-hostgroups-all-check="jj-ansible-hosts-hostgroups-all --check"
+
+#set gather_facts: False
+#currently only used by connect-host playbook
+alias jj-ansible-hosts-hostgroups-all-nofacts="jj-ansible-hosts ${var_hg_all_nofacts}"
+
+###########
+#tags:
+#alias jj-ansible-tags-list="jj-ansible-hosts --limit 'balls' --extra-vars 'hostgroups=dummy' --list-tags --list-tasks"
+#alias jj-ansible-tags-play="jj-ansible-hosts-hostgroups-all --tags"
+#alias jj-ansible-tags-check="jj-ansible-hosts-hostgroups-all --check --tags"
+#alias jj-ansible-tags-skip="jj-ansible-hosts-hostgroups-all --skip-tags"
+#
+#or define using a function, but it's not really any better:
+function jj-ansible-hosts-hostgroups () {
+	 hg="$1" ; shift
+	 jj-ansible-hosts --extra-vars "hostgroups=$1" "$@"
+}
+alias jj-ansible-tags-list="jj-ansible-hosts-hostgroups dummy --limit 'balls' --list-tags --list-tasks"
+alias jj-ansible-tags-play="jj-ansible-hosts-hostgroups all --tags"
+alias jj-ansible-tags-check="jj-ansible-hosts-hostgroups all --check --tags"
+alias jj-ansible-tags-skip="jj-ansible-hosts-hostgroups all --skip-tags"
+
+###########################
+#connect a fresh host by copying ssh key to /root/.ssh/authorized_keys file (and to user jss for my convenience)
+
+#(without ansible) setup new machines with our ssh host key so we can ansible them:
+#alias jj-connect-new="sshpass -p ${vm_root_password} ssh-copy-id -i ~/.ssh/id_rsa.pub -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" 
+
+#using ansible connect-host playbook
+alias jj-ansible-connect-play="jj-ansible-hosts-hostgroups-all-nofacts ${var_playbook_connect} --tags=connect-new-host --limit"
+alias jj-ansible-connect-check="jj-ansible-hosts-hostgroups-all-nofacts ${var_playbook_connect} --tags=connect-new-host --check --limit"
+
+#Fedora hosts also need python2-dnf installed, because by default they only install python3 stuff, and ansible can't use that yet *groan*.
+alias jj-ansible-connect-python-play="jj-ansible-hosts-hostgroups-all  ${var_playbook_connect} --tags=ansible_requirements --limit"
+alias jj-ansible-connect-python-check="jj-ansible-hosts-hostgroups-all ${var_playbook_connect} --tags=ansible_requirements --check --limit"
+
+#set hostname:
+function jj-ansible-set-hostname () {
+	 old_hostname="$1" ; shift
+	 new_hostname="$1" ; shift
+	 jj-ansible-hosts "${var_playbook_connect}" --tags="set-hostname" --extra-vars "hostgroups=all new_hostname=$new_hostname" --limit ${old_hostname} "$@"   #ensure vars are shifted and $@ is at the end so --chekc can be passed through
+}
+function jj-ansible-set-hostname-check () {
+	 jj-ansible-set-hostname "$1" "$2" "--check"
+}
+
+#connect centos-soe host:
+alias jj-ansible-connect-play-centos-soe="jj-ansible-connect-play centos-soe.soe.vorpal ; jj-ansible-connect-python-play centos-soe.soe.vorpal "
+alias jj-ansible-connect-check-centos-soe="jj-ansible-connect-check centos-soe.soe.vorpal -v ; jj-ansible-connect-python-check centos-soe.soe.vorpal -v"
+
+############################
+#start puppet client cronjob:
+alias jj-ansible-puppet-start="jj-ansible-hosts-hostgroups all ${var_playbook_puppet_start} --limit"
+alias jj-ansible-puppet-stop="jj-ansible-hosts-hostgroups all ${var_playbook_puppet_stop} --limit"
+
+###########################
+#group commands
+
+alias jj-ansible-aws="jj-ansible-hosts ${var_hg_aws}"
+alias jj-ansible-vms="jj-ansible-hosts ${var_hg_vms}"
+
+alias jj-ansible-aws-check="jj-ansible-aws --check"
+alias jj-ansible-vms-check="jj-ansible-vms --check"
+
+###########################
+#host commands:
+#these need to be followed by playbook etc:
+
+alias jj-ansible-il-duce="jj-ansible-hosts     ${var_il_duce}"
+alias jj-ansible-homunculoid="jj-ansible-hosts ${var_homunculoid}"
+alias jj-ansible-voltaire="jj-ansible-hosts    ${var_voltaire}"
+alias jj-ansible-putin="jj-ansible-hosts       ${var_putin}"
+alias jj-ansible-rawhide="jj-ansible-hosts     ${var_rawhide}"
+alias jj-ansible-centos-soe="jj-ansible-hosts  ${var_centos_soe}"
+
+#with --check
+alias jj-ansible-il-duce-check="jj-ansible-il-duce         --check"
+alias jj-ansible-homunculoid-check="jj-ansible-homunculoid --check"
+alias jj-ansible-voltaire-check="jj-ansible-voltaire       --check"
+alias jj-ansible-putin-check="jj-ansible-putin             --check"
+alias jj-ansible-rawhide-check="jj-ansible-rawhide         --check"
+alias jj-ansible-centos-soe-check="jj-ansible-centos-soe   --check"
+
+#########################
+#soe playbook = ${var_playbook_soe}
+alias jj-ansible-soe-play="jj-ansible-hosts ${var_playbook_soe} "
+alias jj-ansible-soe-check="jj-ansible-soe-play --check"
+
+#soe playbook vs all vms:
+alias jj-ansible-vms-soe-play="jj-ansible-vms ${var_playbook_soe}"
+alias jj-ansible-vms-soe-check="jj-ansible-vms-soe-play --check"
+
+##soe playbook vs specific hosts
+alias jj-ansible-centos-soe-soe-play="jj-ansible-soe-play   ${var_centos_soe}"
+alias jj-ansible-centos-soe-soe-check="jj-ansible-soe-check ${var_centos_soe}"
+alias jj-ansible-centos-soe-soe-play-tags="jj-ansible-centos-soe-soe-play   --tags"
+alias jj-ansible-centos-soe-soe-check-tags="jj-ansible-centos-soe-soe-check --tags"
+
+alias jj-ansible-voltaire-soe-play="jj-ansible-soe-play   ${var_voltaire}"
+alias jj-ansible-voltaire-soe-check="jj-ansible-soe-check ${var_voltaire}"
+alias jj-ansible-voltaire-soe-play-tags="jj-ansible-voltaire-soe-play   --tags"
+alias jj-ansible-voltaire-soe-check-tags="jj-ansible-voltaire-soe-check --tags"
+
+alias jj-ansible-putin-soe-play="jj-ansible-soe-play   ${var_putin}"
+alias jj-ansible-putin-soe-check="jj-ansible-soe-check ${var_putin}"
+alias jj-ansible-putin-soe-play-tags="jj-ansible-putin-soe-play   --tags"
+alias jj-ansible-putin-soe-check-tags="jj-ansible-putin-soe-check --tags"
+
+alias jj-ansible-rawhide-soe-play="jj-ansible-soe-play   ${var_rawhide}"
+alias jj-ansible-rawhide-soe-check="jj-ansible-soe-check ${var_rawhide}"
+alias jj-ansible-rawhide-soe-play-tags="jj-ansible-rawhide-soe-play   --tags"
+alias jj-ansible-rawhide-soe-check-tags="jj-ansible-rawhide-soe-check --tags"
+
+alias jj-ansible-bustard-soe-play="jj-ansible-soe-play   ${var_bustard}"
+alias jj-ansible-bustard-soe-check="jj-ansible-soe-check ${var_bustard}"
+alias jj-ansible-bustard-soe-play-tags="jj-ansible-bustard-soe-play   --tags"
+alias jj-ansible-bustard-soe-check-tags="jj-ansible-bustard-soe-check --tags"
+
+#####################################
+#not used for s while now:
+
+#setup playbook = ${var_playbook_setup}
+alias jj-ansible-setup-play="jj-ansible-hosts ${var_playbook_setup}"
+alias jj-ansible-setup-check="jj-ansible-hosts-setup-play --check"
+
+#setup playbook vs specific hosts
+alias jj-ansible-il-duce-setup-play="jj-ansible-setup-play   ${var_il_duce}"
+alias jj-ansible-il-duce-setup-check="jj-ansible-setup-check ${var_il_duce}"
+alias jj-ansible-il-duce-setup-play-tags="jj-ansible-il-duce-setup-play   --tags"
+alias jj-ansible-il-duce-setup-check-tags="jj-ansible-il-duce-setup-check --tags"
+
+alias jj-ansible-homunculoid-setup-play="jj-ansible-setup-play   ${var_homunculoid}"
+alias jj-ansible-homunculoid-setup-check="jj-ansible-setup-check ${var_homunculoid}"
+alias jj-ansible-homunculoid-setup-play-tags="jj-ansible-homunculoid-setup-play   --tags"
+alias jj-ansible-homunculoid-setup-check-tags="jj-ansible-homunculoid-setup-check --tags"
+
+alias jj-ansible-voltaire-setup-play="jj-ansible-setup-play   ${var_voltaire}"
+alias jj-ansible-voltaire-setup-check="jj-ansibles-setup-check ${var_voltaire}"
+alias jj-ansible-voltaire-setup-play-tags="jj-ansible-voltaire-setup-play   --tags"
+alias jj-ansible-voltaire-setup-check-tags="jj-ansible-voltaire-setup-check --tags"
+
+alias jj-ansible-putin-setup-play="jj-ansible-setup-play   ${var_putin}"
+alias jj-ansible-putin-setup-check="jj-ansible-setup-check ${var_putin}"
+alias jj-ansible-putin-setup-play-tags="jj-ansible-putin-setup-play   --tags"
+alias jj-ansible-putin-setup-check-tags="jj-ansible-putin-setup-check --tags"
+
+alias jj-ansible-rawhide-setup-play="jj-ansible-setup-play   ${var_rawhide}"
+alias jj-ansible-rawhide-setup-check="jj-ansible-setup-check ${var_rawhide}"
+alias jj-ansible-rawhide-setup-play-tags="jj-ansible-rawhide-setup-play   --tags"
+alias jj-ansible-rawhide-setup-check-tags="jj-ansible-rawhide-setup-check --tags"
+
+alias jj-ansible-centos-soe-setup-play="jj-ansible-setup-play   ${var_centos_soe}"
+alias jj-ansible-centos-soe-setup-check="jj-ansible-setup-check ${var_centos_soe}"
+alias jj-ansible-centos-soe-setup-play-tags="jj-ansible-centos-soe-setup-play   --tags"
+alias jj-ansible-centos-soe-setup-check-tags="jj-ansible-centos-soe-setup-check --tags"
+#####################################
+
+
+
+#----------------------------------------------------------------------------
+#misc
+alias jj-collectd-ls="collectdctl listval"
+
+#manageig/cloudforms
+alias jj-miq="docker run --privileged -d -p 8443:443 manageiq/manageiq:fine-4"
+
+#mysql
+#mysql --user root --password=thisisnotarealpassword
+#show databases;
+#drop database `cdash-master`;
+
+#kvm/virsh:
+#I've actually managed to stop stupid guestfish thing from inspecting guest configuration how in hells did i do that
+
+#Goddamned virsh manpage is wrong, it's full utter shite claiming we can update domain, and no mention that we cant modufy dhcp range:
+#
+#Info from from https://wiki.libvirt.org/page/Networking#virsh_net-update
+#seems correct:
+#The config items in a network that can be changed with virsh net-update are:
+#   ip-dhcp-host
+#   ip-dhcp-range (add/delete only, no modify)
+#   forward-interface (add/delete only)
+#   portgroup
+#   dns-host
+#   dns-txt
+#   dns-srv
+
+#nope:
+#virsh net-update soe modify ip '<ip address="192.168.125.1" netmask="255.255.255.0"> <dhcp> <range start="192.168.125.201" end="192.168.125.250"/> <bootp file="pxelinux.0" server="192.168.1.100"/></dhcp></ip>'
+
+#nope:
+#virsh net-update soe.vorpal modify domain '<domain name="soe.vorpal" localOnly='yes'/>' --config
+#NOTE:
+#localOnly='yes' is needed to avoid shitstorms of dns looping.
+#without it, dnsmasq will still query upstream servers for the machines in its domain.
+#ie query from vm host -> dnsmasq -> vm host -> dnsmasq etc.
+
+#If --live is specified, affect a running network.
+#If --config is specified, affect the next startup of a persistent network.
+#If --current is specified, affect the current network state.
+#Both --live and --config flags may be given, but --current is exclusive. Not specifying any flag is the same as specifying --current.
+
+#have to edit manually
+#virsh net-edit soe.vorpal
+#virsh net-destroy soe.vorpal
+#virsh net-start soe.vorpal
+
+#libvirt dhcp leases are stored here
+#/var/lib/libvirt/dnsmasq/virbr*.status
+
+
+##############################
+#firewall commands:
+
+alias jj-firewalld-ls="firewall-cmd --list-all"
+alias jj-firewalld-status="systemctl status firewalld"
+alias jj-firewalld-reload="firewall-cmd --reload"
+
+
+#firewall-cmd --get-default-zone
+#FedoraWorkstation
+
+#firewall-cmd --set-default-zone=home
+
+#[root@Il-Duce 12-25 14:55:13 ansible]# firewall-cmd --list-all
+#FedoraWorkstation (active)
+#  target: default
+#  icmp-block-inversion: no
+#  interfaces: enp0s31f6
+#  sources: 
+#  services: dhcpv6-client mdns samba-client ssh samba tftp dhcp http https
+#  ports: 1025-65535/udp 1025-65535/tcp
+#  protocols: 
+#  masquerade: no
+#  forward-ports: 
+#  source-ports: 
+#  icmp-blocks: 
+#  rich rules:
+
+#firewall-cmd --get-zones
+#FedoraServer FedoraWorkstation block dmz drop external home internal public trusted work
+
+#firewall-cmd --zone=home --list-all
+#firewall-cmd --list-all-zones | less
+
+#we can transition our eth0 interface to the "home" zone by typing this:
+#firewall-cmd --zone=home --change-interface=eth0
+
+#firewall-cmd --get-active-zones
+#FedoraWorkstation
+#  interfaces: enp0s31f6
+
+#less /etc/sysconfig/network-scripts/ifcfg-enp0s31f6
+#...
+#ZONE=FedoraWorkstation
+
+#firewall-cmd --get-services
+#this isn't all, just most important ones:
+#RH-Satellite-6
+#ceph ceph-mon
+#cfengine
+#dhcp dhcpv6 dhcpv6-client
+#dns
+#freeipa-ldap freeipa-ldaps freeipa-replication freeipa-trust
+#ftp
+#high-availability
+#http https
+#ipsec
+#iscsi-target
+#kadmin kerberos
+#klogin
+#kpasswd
+#kshell
+#ldap ldaps libvirt
+#libvirt-tls
+#mdns
+#mountd
+#mssql
+#mysql
+#nfs
+#nrpe   ##Aha!
+#ntp
+#openvpn
+#ovirt-imageio ovirt-storageconsole ovirt-vmconsole ovirtlago
+#postgresql
+#pulseaudio
+#puppetmaster
+#rpc-bind
+#rsh
+#rsyncd
+#samba samba-client
+#snmp snmptrap
+#squid
+#ssh
+#synergy
+#telnet
+#tftp tftp-client
+#vdsm
+#vnc-server
+
+#running config:
+#firewall-cmd --zone=FedoraWorkstation --add-service=http
+#firewall-cmd --zone=FedoraWorkstation --list-services
+
+#permanent config:
+#firewall-cmd --zone=FedoraWorkstation --permanent --add-service=http
+#firewall-cmd --zone=FedoraWorkstation --permanent --list-services
+
+#if no suitable service defined:
+#firewall-cmd --zone=public --add-port=5000/tcp
+#firewall-cmd --zone=public --permanent --add-port=4990-4999/udp
+#firewall-cmd --list-ports
+
+#jj-sc-restart firewalld
+#or:
+#firewall-cmd --reload
+
+#il-duce:
+#  services: dhcpv6-client mdns samba-client ssh samba tftp dhcp http https
+#  ports: 1025-65535/udp 1025-65535/tcp
+#
+#on clients/vms:
+#add:
+#    services: nrpe
+#    ports: collectd, cockpit
+#
+#    cockpit listens on port 9090
+
+#collectd clients have server specified as:
+#Server "192.168.1.100" "25826"
+#looks like clients are sending data to server, need to open that port on server
+#but it's already in il-duce open range 1025-65535, should be good.
+#
+#nrpe clients listen on port 5666
+
+#firewall-cmd --zone=public --permanent --add-service=nrpe
+#firewall-cmd --zone=public --permanent --add-port=9090/tcp
+#firewall-cmd --reload
+#
+#[root@voltaire ~]# firewall-cmd --list-all
+#public (active)
+#  services: ssh dhcpv6-client ceph-mon nrpe
+#  ports: 9090/tcp
+
+
+#################
+#f27 server:
+#dnf.conf: keepcache=1
+#dnf install emacs
+#dnf groupinstall "Xfce Desktop"
+#systemctl set-default graphical.target
+#systemctl enable lightdm
+#systemctl isolate graphical.target
+
+
+
+
+#Debian/Ubuntu
+
+alias jj-apt-search="apt search"       #<package_name>
+alias jj-apt-show="apt show"           #<package_name>
+alias jj-apt-list="apt list"           #<package_name>
+alias jj-apt-remove="apt remove"       #<package_name>
+
+
+alias jj-apt-dpkg-files="dpkg-query -L"       #<package_name>
+
+#To see the files contained in a package NOT installed, do this once (if you haven't installed apt-file already:
+alias jj-apt-files-update="apt-file update"   ##apt-get install apt-file
+alias jj-apt-files="apt-file list"            #<package_name>
+
+
+#To see the files a .deb file will install
+#dpkg-deb -c <package_name.deb>

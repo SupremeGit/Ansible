@@ -1,0 +1,4 @@
+---
+  - name: Ping server
+    action: ping
+    tags: ping

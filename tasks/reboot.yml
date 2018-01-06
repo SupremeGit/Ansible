@@ -1,0 +1,9 @@
+---
+- name: Warning - Rebooting.
+  command: wall "Rebooting."
+  tags: reboot-linux
+
+- name: Reboot
+  remote_user: root
+  command: shutdown -r now
+  tags: reboot-linux

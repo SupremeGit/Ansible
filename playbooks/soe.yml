@@ -1,0 +1,62 @@
+---
+
+#Master playbook for ansible-soe
+#Use connect-host.yml playbook to setup hosts so you can ansible them into shape.
+
+- hosts: "{{ hostgroups }}"
+  remote_user: root
+
+  vars:
+    facts_on: 'yes'  #Override using command line --extra-vars 'facts_on=no'
+  vars_files:
+    - vars/soe_vars.yml
+    - /etc/ansible/vars/default_vars.yml
+
+  gather_facts: "{{ facts_on }}"
+  tasks:
+    - debug:
+        msg: "Facts_on = {{ facts_on }}"
+      tags: debug
+
+    - debug:
+        msg: "System {{ inventory_hostname }} has ansible_os_family {{ansible_os_family}}, ansible_distribution {{ansible_distribution}}, ansible_distribution_major_version {{ansible_distribution_major_version}}."
+      when: facts_on == 'yes'
+      tags: debug
+
+    - import_tasks: /etc/ansible/tasks/update-files.yml           #update /etc/hosts, bashrc & aliases
+    - import_tasks: /etc/ansible/tasks/firewall.yml               #ensure firewall is up & running
+
+      #install basic repos & setup puppet, nagios nrpe, collectd, cockpit
+      #open firewall ports for: nrpe, collectd, cockpit
+    - import_tasks: /etc/ansible/tasks/soe.yml
+      when: ('il-duce' not in inventory_hostname) and facts_on == 'yes'
+
+    - import_tasks: /etc/ansible/tasks/install-apps.yml           #install/update key apps
+
+
+####################################################################
+#Todo:
+#do this separately:
+#   - import_tasks: /etc/ansible/tasks/update-os.yml              #update all packages
+
+
+#Notes:
+#1) double commands (with &&), like this:
+#     command: cd {{ puppet_src }} && git clone {{ my_soe_repo }} .
+#   seem not to work, and produce no stdout/stderr to debug. Painful.
+#
+#2) need to accept new puppet client on the puppet server, if we switch to using master/slave
+#
+#3) When setting var like:
+#      facts_on: 'yes'
+#   must 'quote' or yes becomes 'True'!
+#
+#
+
+
+# -*- mode: sh; -*-
+# Emacs won't recognise the line above, unless it's on first line.
+# So instead:
+# Local Variables:
+# mode: sh
+# End:

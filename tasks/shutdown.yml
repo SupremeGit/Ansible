@@ -1,0 +1,10 @@
+---
+- name: Warning - Shutting down.
+  command: wall "Shutting down."
+  tags: shutdown-linux
+
+- name: Shutdown
+  remote_user: root
+  command: shutdown -h now  #real shutdown
+#  command: /usr/sbin/shutdown -k now  #only write wall message
+  tags: shutdown-linux

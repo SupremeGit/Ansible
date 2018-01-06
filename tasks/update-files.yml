@@ -1,0 +1,13 @@
+---
+
+- name: Update /etc/hosts
+  synchronize: src=/etc/ansible/files/system/hosts dest=/etc/hosts
+  tags: etc-hosts
+
+- name: Update root .bashrc
+  synchronize: src=/etc/ansible/files/root/.bashrc dest=/root/
+  tags: bashrc-root
+
+- name: Update root .bashrc_aliases
+  synchronize: src=/etc/ansible/files/root/.bashrc_aliases dest=/root/
+  tags: aliases-root

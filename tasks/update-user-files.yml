@@ -1,0 +1,13 @@
+---
+
+- name: Update jss .bashrc
+  synchronize: src=/etc/ansible/files/jss/.bashrc dest=/home/jss/
+  tags: bashrc-jss
+
+- name: Update jss .bashrc_aliases
+  synchronize: src=/etc/ansible/files/jss/.bashrc_aliases dest=/home/jss/
+  tags: aliases-jss
+
+- name: Update bitnami .bashrc_aliases
+  synchronize: src=/etc/ansible/files/bitnami/.bashrc_aliases dest=/home/bitnami/
+  tags: aliases-bitnami

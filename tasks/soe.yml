@@ -1,0 +1,272 @@
+---
+
+######################################################
+#Setup epel, puppet5, & SOE puppet repos
+#Install & setup important monitoring apps (nagios, collectd, cockpit)
+
+- name: Install CentOS-Local el7 repo
+  synchronize: src={{ centos_local_repofile }} dest=/etc/yum.repos.d/
+  when:
+    - ansible_os_family == 'RedHat' and not ansible_distribution == "Fedora" and ansible_distribution_major_version >= '7'
+  tags: install-local-repos
+
+- name: Install Fedora-Local repo
+  synchronize: src={{ fedora_local_repofile }} dest=/etc/yum.repos.d/
+  when:
+    - ansible_os_family == 'RedHat' and ansible_distribution == "Fedora"
+  tags: install-local-repos
+
+  #move this to a playbook that's easier to use to toggle settings
+- name: Turn dnf keepcache on
+  lineinfile:
+    path: /etc/dnf/dnf.conf
+    regexp: '^keepcache='
+    line: 'keepcache=1'
+  when:
+    - ansible_os_family == 'RedHat' and (ansible_distribution == "Fedora") or (not ansible_distribution == "Fedora" and ansible_distribution_major_version > '7')
+  tags: keepcache-on
+
+  #move this to a playbook that's easier to use to toggle settings
+- name: Turn yum keepcache on
+  lineinfile:
+    path: /etc/yum.conf
+    regexp: '^keepcache='
+    line: 'keepcache=1'
+  when:
+    - ansible_os_family == 'RedHat' and not ansible_distribution == "Fedora" and ansible_distribution_major_version <= '7'
+  tags: keepcache-on
+
+- name: Check if EPEL repo is already configured.
+  stat: path={{ epel_repofile_path }}
+  register: epel_repofile_result
+  when: ansible_os_family == 'RedHat' and not ansible_distribution == "Fedora" and ansible_distribution_major_version >= '7'
+  tags: install-epel
+
+- name: Install Epel repo.
+  yum:  name="epel-release" state=latest
+  when: 
+    - ansible_os_family == 'RedHat'  and not ansible_distribution == "Fedora" and ansible_distribution_major_version >= '7'
+    - not epel_repofile_result.stat.exists
+  tags: install-epel
+
+- name: Import EPEL GPG key.
+  rpm_key:
+    key: "{{ epel_repo_gpg_key_url }}"
+    state: present
+  when:
+    - ansible_os_family == 'RedHat'  and not ansible_distribution == "Fedora" and ansible_distribution_major_version >= '7'
+    - not epel_repofile_result.stat.exists
+  tags: install-epel
+
+- name: Check if Puppet repo is already configured.
+  stat: path={{ puppet_repofile }}
+  register: puppet_repofile_result
+  tags: install-puppet-repo
+
+- name: Install temporary Puppet5 el7 repo
+  synchronize: src={{ puppet_repofile_el7 }} dest={{ puppet_repofile }}
+  when:
+    - ansible_os_family == 'RedHat' and not ansible_distribution == "Fedora" and ansible_distribution_major_version >= '7'
+    - not puppet_repofile_result.stat.exists
+  tags: install-puppet-repo
+  
+- name: Install temporary Puppet5 Fedora repo
+  synchronize: src={{ puppet_repofile_fedora }} dest={{ puppet_repofile }}
+  when: ansible_os_family == 'RedHat' and ansible_distribution == "Fedora" and not puppet_repofile_result.stat.exists
+  tags: install-puppet-repo
+
+- name: Install temporary Puppet5 Debian repo
+  debug:
+        msg: "Not implemented."
+  when: ansible_os_family == "Debian" and not puppet_repofile_result.stat.exists
+  tags: install-puppet-repo
+
+- name: Import Puppet GPG key with rpm.
+  rpm_key:
+    key: "{{ puppet_repo_gpg_key_url }}"
+    state: present
+  when: ansible_os_family == 'RedHat' and not puppet_repofile_result.stat.exists
+  tags: install-puppet-repo
+
+- name: Import Puppet GPG key with apt.
+  apt_key:
+    url: "{{ puppet_repo_gpg_key_url }}"
+    state: present
+  when: ansible_os_family == 'Debian' and not puppet_repofile_result.stat.exists
+  tags: install-puppet-repo
+
+- name: Yum install/update key el7 SOE apps
+  yum: state=latest name={{ item }}
+  with_items: "{{ key_soe_apps_list  + key_soe_apps_list_redhat + key_soe_apps_list_el7 + puppet_list }}"
+  when: ansible_os_family == 'RedHat' and not ansible_distribution == "Fedora" and ansible_distribution_major_version >= '7'
+  tags: soe-apps
+
+- name: Dnf install/update key Fedora SOE apps
+  dnf: state=latest name={{ item }}
+  with_items: "{{ key_soe_apps_list + key_soe_apps_list_redhat + key_soe_apps_list_fedora }}"
+  when: ansible_os_family == "RedHat" and ansible_distribution == "Fedora"
+  tags: soe-apps
+
+- name: Dnf install/update puppet on Fedora <=26
+  dnf: state=latest name={{ item }}
+  with_items: "{{ puppet_list }}"
+  when: ansible_os_family == "RedHat" and ansible_distribution == "Fedora" and ansible_distribution_major_version <= '26'
+  tags: soe-apps
+
+- name: Apt-get install/update key debian SOE apps
+  apt:	state=latest name={{ item }}
+  with_items: "{{ key_soe_apps_list  + key_soe_apps_list_debian }}"
+  when: ansible_os_family == "Debian"
+  tags: soe-apps
+
+- name: Install Puppet SOE repo.
+  git:
+    repo: "{{ my_soe_repo }}"
+    dest: "{{ puppet_src }}/"
+  tags: install-puppet-soe
+
+
+##################################################################
+#Firewall rules:
+#firewalld must be running or we get errors when we try to add rules:
+
+- name: Open Nagios nrpe plugin firewalld port.
+  firewalld:
+    service: nrpe
+    permanent: true
+    state: enabled
+  when: not ansible_os_family == "Debian"
+  tags: firewalld,nrpe,nagios-firewall-open
+
+- name: Open Nagios nrpe plugin ufw firewall port.
+  ufw:
+    #name: nrpe
+    port: 5666
+    proto: tcp
+    rule: allow
+  when: ansible_os_family == "Debian"
+  tags: firewalld,nrpe,nagios-firewall-open
+
+- name: Open Collectd firewall port.
+  firewalld:
+    port: 25826/tcp
+    permanent: true
+    state: enabled
+  when: not ansible_os_family == "Debian"
+  tags: firewalld,collectd,collectd-firewall-open
+
+- name: Open Collectd ufw firewall port.
+  ufw:
+    #name: collectd
+    port: 25826
+    proto: tcp
+    rule: allow
+  when: ansible_os_family == "Debian"
+  tags: firewalld,nrpe,nagios-firewall-open
+
+
+########################################################
+#Configure some services:
+
+- name: Configure Nagios nrpe service.
+  synchronize: src=/etc/ansible/files/system/nrpe.cfg dest=/etc/nagios/
+  when: not ansible_os_family == "Debian"
+  tags: nrpe,nagios-nrpe-config
+
+- name: Configure Nagios nrpe service (Debian).
+  synchronize: src=/etc/ansible/files/system/nrpe_local.cfg dest=/etc/nagios/
+  when: ansible_os_family == "Debian"
+  tags: nrpe,nagios-nrpe-config
+
+#- name: Configure Nagios nrpe-ng service.
+#  synchronize: src=/etc/ansible/files/system/nrpe-ng.cfg dest=/etc/nagios/
+#  when: ansible_os_family == "Debian"
+#  tags: nrpe,nagios-nrpe-config
+
+- name: Add systemd drop-in to ensure nrpe service starts after network.
+  synchronize: src=/etc/ansible/files/system/nrpe.systemd.dropin.conf dest=/etc/systemd/system/nrpe.service.d/
+  when: not ansible_os_family == "Debian"
+  tags: nrpe,nagios-nrpe-dropin
+
+- name: Add systemd drop-in to ensure nrpe service starts after network (Debian).
+  synchronize: src=/etc/ansible/files/system/nrpe.systemd.dropin.conf dest=/etc/systemd/system/nagios-nrpe-server.service.d/
+  when: ansible_os_family == "Debian"
+  tags: nrpe,nagios-nrpe-dropin
+  
+- name: Configure Collectd service.
+  synchronize: src=/etc/ansible/files/system/collectd.conf dest=/etc/
+  tags: collectd,collectd-config
+
+#Start services:
+- name: Enable & start Nagios nrpe.
+  service:
+    name: nrpe
+    enabled: yes
+    state: started
+  when: not ansible_os_family == "Debian"
+  tags: nrpe,nrpe-enable
+
+#- name: Enable & start Nagios nrpe-ng.
+#  service:
+#    name: nrpe-ng
+#    enabled: yes
+#    state: started
+#  when: ansible_os_family == "Debian"
+#  tags: nrpe,nrpe-enable
+
+- name: Enable & start Nagios nrpe (Debian).
+  service:
+    name: nagios-nrpe-server
+    enabled: yes
+    state: started
+  when: ansible_os_family == "Debian"
+  tags: nrpe,nrpe-enable
+
+- name: Enable & start Collectd.
+  service:
+    name: collectd
+    enabled: yes
+    state: started
+  tags: collectd,collectd-enable
+
+- name: Dnf install/update Fedora 27 groups
+  dnf: state=latest name={{ item }}
+  with_items: "{{ key_soe_groups_list_f27 }}"
+  when: ansible_os_family == "RedHat" and ansible_distribution == "Fedora" and ansible_distribution_major_version == '27'
+  tags: dnf-groups-f27
+  
+- name: "F27 Server - Enable LightDM"
+  service:
+    name: lightdm
+    enabled: yes
+    #state: started
+  when: ansible_os_family == "RedHat" and ansible_distribution == "Fedora" and ansible_distribution_major_version == '27'
+  tags: f27-server
+
+
+- name: "F27 - check default targetl"
+  command: systemctl get-default
+  when: ansible_os_family == "RedHat" and ansible_distribution == "Fedora" and ansible_distribution_major_version == '27'
+  #failed_when: runlevel.stdout != "graphical.target"
+  #failed_when: 0 != 1
+  changed_when: False
+  register: runlevel
+  tags: f27-runlevel
+
+- name: "F27 Server - set default target to graphical.target"
+  command: systemctl set-default graphical.target
+  when: ansible_os_family == "RedHat" and ansible_distribution == "Fedora" and ansible_distribution_major_version == '27' and runlevel.stdout != "graphical.target" 
+  tags: f27-server,f27-runlevel
+
+- name: "F27 - Check graphical currently active"
+  command: systemctl is-active graphical.target
+  when: ansible_os_family == "RedHat" and ansible_distribution == "Fedora" and ansible_distribution_major_version == '27'
+  failed_when: graphical.stdout != "active"
+  register: graphical
+  changed_when: False
+  tags: f27-server,f27-runlevel
+
+- name: "F27 - Switch to graphical runlevel"
+  command: systemctl isolate graphical.target
+  when: ansible_os_family == "RedHat" and ansible_distribution == "Fedora" and ansible_distribution_major_version == '27' and graphical.stdout != "active"
+  tags: f27-server,f27-runlevel

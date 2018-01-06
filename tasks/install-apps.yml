@@ -1,0 +1,52 @@
+---
+#need to manually install python-dnf before any of these dnf commands will work:
+
+- name: Yum install/update key apps
+  yum: state=latest name={{ item }}
+  with_items: "{{ key_apps_list }}"
+  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version >= '7'
+  tags: key-apps
+
+- name: Dnf install/update key apps
+  dnf: state=latest name={{ item }}
+  with_items: "{{ key_apps_list }}"
+  when: ansible_os_family == "RedHat" and ansible_distribution == "Fedora"
+  tags: key-apps
+
+- name: Apt-get install/update key apps
+  apt:	state=latest name={{ item }}
+  with_items: "{{ key_apps_list }}"
+  when: ansible_os_family == "Debian"
+  tags: key-apps
+
+- name: Open Cockpit firewall port.
+  firewalld:
+    port: 9090/tcp
+    permanent: true
+    state: enabled
+  when: not ansible_os_family == "Debian"
+  tags: firewalld,cockpit, cockpit-firewall-open
+
+- name: Open Cockpit ufw firewall port.
+  ufw:
+    #name: cockpit
+    port: 9090
+    proto: tcp
+    rule: allow
+  when: ansible_os_family == "Debian"
+  tags: firewalld,cockpit,cockpit-firewall-open
+
+- name: Enable Cockpit.
+  service:
+    name: cockpit
+    enabled: yes
+    #no need to start this, it is started on demand by cockpit.socket
+  tags: cockpit,cockpit-enable
+
+- name: Enable and start Cockpit.socket.
+  service:
+    name: cockpit.socket
+    enabled: yes
+    state: started
+  tags: cockpit,cockpit-enable
+

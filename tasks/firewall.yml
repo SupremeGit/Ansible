@@ -1,0 +1,67 @@
+---
+
+- name: "Debian - remove firewalld"
+  apt:	state=absent name=firewalld
+  when: ansible_os_family == "Debian"
+  tags: firewalld,firewalld-enable
+
+- name: "Debian - install ufw firewall"
+  apt:	state=latest name=ufw
+  when: ansible_os_family == "Debian"
+  tags: firewalld,firewalld-enable
+
+###########################replace ufw with firewalld on ubuntu:
+#can't switch from ufw to firewalld in ubuntu, as ansible firewalld module
+#wont work because ubuntu uses python32 and provides no goddamned python2-firewalld
+
+#- name: "Debian - disable iptables"
+#  systemd:
+#    name: iptables
+#    enabled: no
+#    masked: yes
+#    state: stopped
+#  when: ansible_os_family == "Debian"
+#  tags: firewalld,firewalld-enable
+
+#- name: "Debian - remove ufw firewall"
+#  apt:	state=absent name=ufw
+#  when: ansible_os_family == "Debian"
+#  tags: firewalld,firewalld-enable
+
+#- name: "Debian - install firewalld"
+#  apt:	state=latest name=firewalld
+#  when: ansible_os_family == "Debian"
+#  tags: firewalld,firewalld-enable
+
+
+############################
+#Enable & start firewall:
+
+- name: "Debian - enable and start ufw firewall"
+  systemd:
+    name: ufw
+    enabled: yes
+    masked: no
+    state: started
+  when: ansible_os_family == "Debian"
+  tags: firewalld,firewalld-enable
+
+#- name: "Debian - enable firewalld"
+#  systemd:
+#    name: firewalld
+#    enabled: yes
+#    masked: no
+#    state: started
+#  when: ansible_os_family == "Debian"
+#  tags: firewalld,firewalld-enable
+
+#Note:
+#firewalld must be running or we get errors when we try to add rules:
+- name: Enable & start firewalld.
+  service:
+    name: firewalld
+    enabled: yes
+    state: started
+  when: not ansible_os_family == "Debian"
+  tags: firewalld,firewalld-enable
+

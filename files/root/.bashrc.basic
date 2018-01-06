@@ -1,0 +1,29 @@
+# .bashrc
+
+# User specific aliases and functions
+
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
+
+alias h=history
+alias less="less -MisX"
+alias sbrc="source ~/.bashrc"
+alias cbrc="cat ~/.bashrc"
+alias ebrc="emacs ~/.bashrc"
+
+export PAGER="less -MisX"
+export MANPAGER="less -MisX"
+
+alias yumd="yum --disablerepo=*"
+alias yumfup="yum --disablerepo=* --enablerepo=fedora,updates"
+alias yumfupr="yum --disablerepo=* --enablerepo=fedora,updates,rpmfusion-free,rpmfusion-nonfree"
+alias yumall="yum --enablerepo=*"
+alias yumrpmfusion="yum --disablerepo=* --enablerepo=rpmfusion*"
+
+alias services="kcmshell5 kcm_systemd"

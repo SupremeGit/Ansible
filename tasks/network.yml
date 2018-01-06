@@ -1,0 +1,6 @@
+---
+  - name: Set hostname
+    hostname: 
+      name: "{{ new_hostname }}"
+    tags: set-hostname
+    

@@ -1,0 +1,14 @@
+---
+
+#tasks in this file must be able to run without any ansible facts as it is run with gather_facts: no
+
+- name: Authorise root ssh key
+  local_action: "shell sshpass -p {{ new_vm_password }}  ssh-copy-id -i /root/.ssh/id_rsa.pub -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@{{inventory_hostname}}"
+  tags: connect-new-host
+  
+- name: Authorise jss ssh key
+  local_action: "shell sshpass -p {{ new_vm_password }}  ssh-copy-id -i /home/jss/.ssh/id_rsa.pub -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@{{inventory_hostname}}"
+  tags: connect-new-host
+
+#The tasks above must be run once, with "gather_facts: no", before any other tasks can be run.
+#I had trouble setting gather_facts via command line so I've used facts_on to set gather_facts

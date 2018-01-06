@@ -1,0 +1,19 @@
+---
+
+- hosts: "{{ hostgroups }}"
+  remote_user: root
+
+  vars_files:
+    - vars/soe_vars.yml
+
+  tasks:
+    - name: Stop Puppet.
+      command: rm -f /var/spool/cron/root
+      tags: stop-puppet
+
+#Puppet prefixes its cron entries with: # Puppet Name: run-puppet-jss"
+#Ansible prefixes jobs with: #Ansible: <name>
+#Not going to be able to cross-manage these entries with lame ansible cron module:
+#  cron:
+#    name: "Run Puppet."
+#    state: absent

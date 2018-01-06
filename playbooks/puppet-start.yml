@@ -1,0 +1,12 @@
+---
+
+- hosts: "{{ hostgroups }}"
+  remote_user: root
+
+  vars_files:
+    - vars/soe_vars.yml
+
+  tasks:
+    - name: Start Puppet.
+      command: /opt/puppetlabs/bin/puppet apply "{{ puppet_src }}/jss/manifests/"
+      tags: start-puppet

@@ -1,0 +1,246 @@
+# -*- mode: sh; -*-
+
+#echo "  Executing" ~/.bashrc_functions
+#echo "PWD="`pwd`
+
+############################################################################
+#misc
+function aliastest () { echo balls ; }
+function functionB () { aliasA ; }
+function functionC () { echo "balls" ; }
+
+function mcd () {
+    mkdir -p $1
+    cd $1
+}
+
+function dump_aliases_and_functions () {
+    alias
+    compgen -A function
+}
+function jj-afsort () {
+    #my_aliases=$(alias)
+    #my_functions=$(compgen -A function) 
+    dump_aliases_and_functions | sort
+}
+function jj-afgrep () {
+    dump_aliases_and_functions | sort | grep $@
+}
+
+function find_aliases_used_by_functions () {
+    #bah, results are ruined by short aliases eg ll appearing everywhere
+    for i in $(alias | cut -f 2 -d ' ' | cut -f 1 -d '=') ; do  
+	grep "${i}" ~/.bashrc_functions
+    done
+}
+function find_functions_used_by_aliases () {
+    #also finds functions defined in aliases file, where they shouldn't be.
+    for i in $(compgen -A function) ; do  
+	grep "${i}" ~/.bashrc_aliases
+    done
+}
+
+function jj-gitseturl {
+    git remote set-url origin \"git@github.com:SupremeGit/$1.git\"
+}
+
+#sngle-line functions must have ; after last statement:
+function jj-diff-sbs () { diff --suppress-common-lines --side-by-side --ignore-space-change "$@" ; }
+function jj-diff-sbs-spaces () { diff --suppress-common-lines --side-by-side "$@" ; 
+}
+function jj-diff-sbs-all () { diff --side-by-side "$@" ; 
+}
+function check_argcount () {
+    #call as: check_argcount $# min_args
+    argcount=$1 ; min_args=$2
+    if [[ "$argcount" < "${min_args}" ]]; then
+	echo "Not enough arguments! Wanted ${min_args}, got ${argcount}. Halp!"
+	kill -INT $$
+    fi
+}
+function jj-finddir () {
+   dir="$1" ; shift
+   find "${dir}" -iname "$@"
+}
+
+#alias jj-clean="find '.' -iname '*~' -print -delete"  #use jj-cleandir .
+function jj-cleandir () {
+    check_argcount $# 1
+    dir="$1" ; shift
+    echo "Cleaning dir=<${dir}>."
+    find "${dir}" -iname '*~' -print -delete
+}
+function jj-cleandir-dry-run () {
+    check_argcount $# 1
+    dir="$1" ; shift
+    echo "(DRY-RUN) Cleaning dir=<${dir}>."
+    find "${dir}" -iname '*~' -print
+}
+function jj-grep-ir () {
+    #grep is so goddamned annoying, with search pattern first and directory last.
+    #It's arse-backwards.
+    #Here, we fix it so we can specify directory first, pattern last:
+    dir="$1" ; shift
+    grep -ir "$@" "${dir}" 
+}
+function env_clean () {
+    #Pipe data into this function
+    #Strip lines starting with "}" created by effing BASH_FUNC shellshock mangling shiteballs
+    #If you just export single line functions, you still get closing } on separate line
+    #grep -v "BASH_FUNC" | sort   #So let's not strip this, we want to see this garbage
+    grep -v -e "^}.*" - | sort    #But let's strip the trailing } we dont need to see those after sorting
+}
+function jj-env-pid () { 
+    #display environemnt of pid
+    #handles stupid null terminated vars from /prox/blah/environ
+    self=$$  #pid of self
+    xargs -n 1 -0 < /proc/${1:-$self}/environ   #use given pid or pid of self if not specified
+}
+function jj-env-pid-clean () { 
+    jj-env-pid | env_clean
+}
+function jj-env-stdin () {
+    xargs -n 1 -0 | env_clean
+}
+
+############################################################################
+#systemd
+
+function jj-sc-sv-operation-status () {
+    #usage:   jj-sc-operation-status service operation
+    #does operation (start, stop, restart, reload, etc), followed by status, for the specified service
+    service="$1" ; shift
+    operation="$1" ; shift
+    systemctl "$operation" "$service"
+    systemctl status "$service"
+}
+
+function jj-sc-start   () { jj-sc-sv-operation-status "$1" start ; }
+function jj-sc-restart () { jj-sc-sv-operation-status "$1" restart ; }
+
+vnc_path="/etc/systemd/system/multi-user.target.wants"
+function jj-vnc-all-op () {
+    #usage:   jj-vnc-all-op operation   
+    #does specified operation (start, stop, restart) for each vncserver
+    operation="$1" ; shift
+    for i in "${vnc_path}"/vncserver*.service ; do 
+	sv=`basename "${i}"`
+	echo "${operation}: ${sv}"
+	systemctl "${operation}" "${sv}"
+    done
+}
+function jj-vnc-all-op-status () {
+    #usage:   jj-vnc-op-status operation   
+    #does specified operation (start, stop, restart), followed by status, for each vncserver
+    operation="$1" ; shift
+    for i in "${vnc_path}"/vncserver*.service ; do 
+	sv=`basename "${i}"`
+	echo "${operation}: ${sv}"
+	jj-sc-sv-operation-status "${sv}" "${operation}"
+    done
+}
+function jj-vnc-all-list () {
+    #usage:   jj-vnc-all-list
+    #lists active vnc services
+    for i in "${vnc_path}"/vncserver*.service ; do
+	sv=`basename "${i}"`
+	echo "${sv}"
+    done
+}
+function jj-vnc-sv-op () {
+    #usage:   jj-vnc-op-sv display operation   
+    #does specified operation (start, stop, restart, status) for vncserver on specified display
+    sv_display="$1" ; shift
+    operation="$1" ; shift
+    vnc_service="${vnc_path}"/vncserver*"${sv_display}".service 
+    echo "vnc_service=" ${vnc_service}
+    sv=`basename ${vnc_service}`
+    echo "${operation}: ${sv}"
+    systemctl "${operation}" "${sv}"
+}
+function jj-vnc-sv-op-status () {
+    #usage:   jj-vnc-op-status-sv display operation   
+    #does specified operation (start, stop, restart, status) for vncserver on specified display
+    sv_display="$1" ; shift
+    operation="$1" ; shift
+    jj-vnc-sv-op "${sv_display}" "${operation}"
+    jj-vnc-sv-op "${sv_display}" status
+}
+
+############################################################################
+#yum/dnf/apt
+
+#alias dnfls='dnf list available | tr "\n" "#" | sed -e 's/# / /g' | tr "#" "\n" | sort'
+function jj-dnf-list   () { dnf $@ list available | tr "\n" "#" | sed -e 's/# / /g' | tr "#" "\n" | sort --general-numeric-sort ; }
+function jj-dnf-ls     () { dnf $@ list available | tr "\n" "#" | sed -e 's/# / /g' | tr "#" "\n" | sort --general-numeric-sort ; }
+function jj-dnf-unwrap () { dnf $@ | tr "\n" "#" | sed -e 's/# / /g' | tr "#" "\n" ; }
+function dnfsort       () { dnf $@ | tr "\n" "#" | sed -e 's/# / /g' | tr "#" "\n" | sort --general-numeric-sort ; }
+function jj-dnf-sqsort () { dnf $@ | tr "\n" "#" | sed -e 's/# / /g' | tr "#" "\n" | tr --squeeze-repeats [:blank:] | sort --general-numeric-sort ; }
+function jj-joinsort   () { tr "\n" "#" | sed -e 's/# / /g' | tr "#" "\n" | sort --general-numeric-sort ; }
+
+############################################################################
+#kernel
+
+function jj-kernel-list-available {
+    repos=""
+    for i in kernel-vanilla-fedora kernel-vanilla-stable kernel-vanilla-stable-rc kernel-vanilla-mainline jforbes-kernel-stabilization rawhide ; do
+	repos+="--enablerepo=$i "
+    done
+    cmd="dnf $repos --showduplicates list kernel"
+    echo cmd="$cmd"
+    $cmd
+}
+
+function jj-kernel-list-installed {
+    rpm -q kernel | sort
+}
+function jj-kernel-list-installed-all {
+    #[[ kernel-4.14.5-200.fc26.x86_64 =~ kernel-[0-9].* ]] && echo matched
+    rpm -qa | grep kernel | grep -v kerneloops | grep -v http-kernel | grep -v texlive | sort
+}
+kernel_pkg_names="kernel kernel-core kernel-debug-devel kernel-devel kernel-modules"
+kernel_pkg_names_extra="kernel-headers kernel-tools"
+function jj-kernel-remove () {
+    kernel_version="${1}"
+    kernel_pkgs=""
+    for i in ${kernel_pkg_names} ; do 
+	kernel_pkgs+="${i}-${kernel_version} "
+    done
+    dnf erase $kernel_pkgs
+}
+
+alias jj-kernel-grub-ls="cat /etc/grub2.cfg | grep -i menuentry | grep -i Fedora | grep -v rescue | sort | cut -f2 -d \'"
+alias jj-kernel-stable="jj-kernel-grub-ls | head -n 1"
+alias jj-kernel-new="jj-kernel-grub-ls | tail -n 1"
+
+function jj-kernel-grub () {
+    #example: "grub2-set-default 'Fedora (4.9.13-201.fc25.x86_64) 25 (Workstation Edition)'"
+    kernel="${1}"
+    echo grub2-set-default "$kernel"
+    #crap:
+    #grub-set-default sets the default boot menu entry for all subsequent boots.  
+    #This command only works for GRUB configuration files created with GRUB_DEFAULT=saved in /etc/default/grub.
+}
+function jj-kernel-grub-stable () {
+    kernel=`jj-kernel-stable`
+    jj-kernel-grub "$kernel"
+}
+function jj-kernel-grub-new () {
+    kernel=`jj-kernel-new`
+    jj-kernel-grub "$kernel"
+}
+
+#need a function to get the default, as stupid grub2-tools-minimal does not provide it.
+
+############################################################################
+#Can use all funtions defined above on cmdline after sourcing this script, 
+#but to use any of these functions in following scripts
+#we need to export them with -f:
+#This will contaminate the environment with horrid BASH_FUNC garbage though.
+#So let's not export any functions, unless we have to.
+#export -f jj-diff-sbs jj-diff-sbs-spaces jj-diff-sbs-all
+
+############################################################################
+#echo "PWD="`pwd`
+#echo "  Finished" ~/.bashrc_functions
+

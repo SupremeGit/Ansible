@@ -1,0 +1,15 @@
+---
+
+#group vars don't seem to be present at the playbook level?
+#vars used in playbooks apparently need to be pulled in explicitly in the playbook,
+
+#If so, use something like this your playbooks:
+#vars:
+#     facts_on: 'yes'
+#vars_files:
+#    - /etc/ansible/vars/default_vars.yml
+
+#And put other group vars used in tasks here:
+
+domain: local.vorpal
+gateway: 192.168.1.100

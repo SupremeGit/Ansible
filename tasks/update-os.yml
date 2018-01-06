@@ -1,0 +1,20 @@
+---
+#may need to manually install python2-dnf before any of these dnf commands will work:
+
+- name: Dnf Update all packages
+  dnf: name=* state=latest
+  when: ansible_os_family == "RedHat" and ansible_distribution == "Fedora"
+  tags: update-all
+
+- name: Yum Update all packages
+  yum: name=* state=latest
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version <= "7"
+  tags: update-all
+
+- name: Apt-get update all packages
+  apt:
+    upgrade: dist
+  when: ansible_os_family == "Debian"
+  tags:
+      update-all
+

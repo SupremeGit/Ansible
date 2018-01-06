@@ -1,0 +1,13 @@
+---
+
+googleDNS1: 8.8.8.8
+#telstraDNS1: x.x.x.x
+
+#disable web downloads/installs if you have no interweb
+#interweb_on: True
+interweb_on: False
+
+##switch to "False" to disable development settings & enable production settings
+#development: True
+#development: False
+

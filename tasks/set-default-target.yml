@@ -1,0 +1,8 @@
+---
+- name: Switch default to multi user target
+  command: systemctl set-default multi-user.target
+  tags: multi-user-target
+
+- name: Switch default to graphical target
+  command: systemctl set-default graphical.target
+  tags: graphical-target

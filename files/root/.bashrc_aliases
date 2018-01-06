@@ -1,0 +1,424 @@
+# -*- mode: sh; -*-
+
+#echo "  Executing" ~/.bashrc_aliases
+#echo "PWD="`pwd`
+
+# User specific aliases and functions
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+
+############################################################################
+#basic, general purpose aliases:
+
+alias binds="bind -P | grep 'can be'"
+alias h=history
+alias e=emacs
+
+alias ee="emacs ~/.emacs"              ; alias jj-ee="ee" 
+alias enw="emacs -nw"                  ; alias jj-emacs-no-window="enw"
+alias enc="emacs --color=never"        ; alias jj-emacs-no-colors="enc"
+alias jj-emacs-set-no-colors="alias emacs=\"emacs --color=never\""
+alias jj-emacs-EDITOR-no-window="export EDITOR=emacs -nw"
+
+alias sbrc="source ~/.bashrc"          ; alias jj-sbrc="sbrc"
+alias ebrc="emacs ~/.bashrc"           ; alias jj-ebrc="ebrc"
+alias cbrc="cat ~/.bashrc"             ; alias jj-cbrc="cbrc"
+alias vbrc="vim ~/.bashrc"             ; alias jj-vbrc="vbrc"
+alias vibrc="vi ~/.bashrc"             ; alias jj-vibrc="vibrc"
+
+alias sba="source ~/.bashrc_aliases"   ; alias jj-sba="sba"
+alias eba="emacs ~/.bashrc_aliases"    ; alias jj-eba="eba"
+alias cba="cat ~/.bashrc_aliases"      ; alias jj-cba="cba"
+
+#functions for cmdline:
+alias sbf="source ~/.bashrc_functions" ; alias jj-sba="sbf"
+alias ebf="emacs ~/.bashrc_functions"  ; alias jj-eba="ebf"
+alias cbf="cat ~/.bashrc_functions"    ; alias jj-cba="cbf"
+
+#generic functions for scripts:
+alias ebff="emacs /usr/local/bin/bash_functions.sh" ; alias jj-ebff="ebbf"
+
+alias sbp="source ~/.bashrc_passwords" ; alias jj-sbp="sbp"
+alias ebp="emacs ~/.bashrc_passwords"  ; alias jj-ebp="ebp"
+
+alias eh="emacs /etc/hosts"            ; alias jj-eh="eh"
+alias ch="cat /etc/hosts"              ; alias jj-ch="ch"
+alias gh="cat /etc/hosts | grep"       ; alias jj-gh="gh"
+
+alias l='ls $LS_OPTIONS -lA'
+alias ll='ls $LS_OPTIONS -l'
+alias lla="ls $LS_OPTIONS -la"
+alias llr="ls $LS_OPTIONS -lR"
+alias llar="ls $LS_OPTIONS -laR"
+alias lh='ls $LS_OPTIONS -lAh'
+alias llh='ls $LS_OPTIONS -lh'
+alias llah="ls $LS_OPTIONS -lah"
+alias llrh="ls $LS_OPTIONS -lRh"
+alias llarh="ls $LS_OPTIONS -laRh"
+
+alias les="less"
+alias lesss="less"
+alias jj-t100="tail -n 100"
+alias jj-t1000="tail -n 1000"
+alias jj-psgrep="ps -ef | grep -i"
+alias jj-envgrep="env | grep -i"
+alias jj-find="find . -iname"
+
+alias jj-asort="alias | sort"
+alias jj-agrep="alias | sort | grep -i"
+
+alias jj-fsort="declare -F | sort"
+alias jj-fgrep="declare -F | sort | grep -i"
+
+############################################################################
+#system-related commands:
+
+alias jj-freboot="reboot --force"
+alias jj-fhalt="poweroff --force"
+
+alias jj-sudo="sudo -H"
+
+alias jj-uchmod="chmod u+rwX"
+alias jj-gchmod="chmod g+rwX"
+alias jj-ugchmod="chmod ug+rwX"
+alias jj-achmod="chmod a+rwX"
+
+alias jj-urchmod="chmod -Rf u+rwX"
+alias jj-grchmod="chmod -Rf g+rwX"
+alias jj-ugrchmod="chmod -Rf ug+rwX"
+alias jj-archmod="chmod -Rf a+rwX"
+
+alias jj-chown="chown jss"
+alias jj-chowng="chown jss.jss"
+alias jj-chgrp="chgrp jss"
+
+alias jj-rchown="chown -Rf jss"
+alias jj-rchowng="chown -Rf jss.jss"
+alias jj-rchgrp="chgrp -Rf jss"
+
+alias jj-dus="du -hxs"
+alias jj-du1="du -hx --max-depth=1"
+alias jj-du2="du -hx --max-depth=2"
+alias jj-du3="du -hx --max-depth=3"
+alias jj-cpsparse="cp --sparse=always"
+
+alias jj-fbd="dolphin > /dev/null 2>&1"
+alias jj-fbt="thunar > /dev/null 2>&1"
+alias jj-vm="virt-manager"
+alias jj-chrome="/usr/bin/google-chrome-stable --password-store=basic"
+alias jj-switch-dm="system-switch-displaymanager"
+alias jj-xdesk="startx -- -config xorg.desk.conf > xorg.desk.log 2>&1"
+
+############################################################################
+#Systemd:
+alias jj-services="kcmshell5     kcm_systemd"
+
+#systemctl aliases prefixed with -sc-
+alias jj-sc-suspend="systemctl   suspend"
+alias jj-sc-hibernate="systemctl hibernate"
+alias jj-sysls="systemd-cgls"
+alias jj-sc-sysdebug="systemctl  enable debug-shell.service"
+alias jj-sc-debugoff="systemctl  disable debug-shell.service"
+alias jj-sc-services="systemctl  list-unit-files --type=service"
+alias jj-sc-reload="systemctl    daemon-reload"
+alias jj-sc-timers="systemctl    list-timers     --all"
+alias jj-sc-status="systemctl    status "
+alias jj-sc-stop="systemctl      stop "
+alias jj-sc-enable="systemctl    enable "
+alias jj-sc-disable="systemctl   disable "
+alias jj-sc-mask="systemctl      mask "
+
+alias jj-sc-user-services="systemctl --user list-unit-files --type=service"
+alias jj-sc-user-status="systemctl   --user status"
+
+#loginctl:
+alias jj-loginls="loginctl      list-sessions"
+alias jj-loginshows="loginctl   show-session"    #followed by ID  #shows brief summary
+alias jj-loginstatus="loginctl  session-status"  #followed by ID  #shows full tree
+alias jj-lc-status="loginctl session-status"
+
+alias jj-hostnamectl-set-hostname="hostnamectl set-hostname"
+
+#Journalctl:
+#/etc/systemd/journald.conf   #SystemMaxUse=200M
+
+alias jj-jc-du="journalctl     --disk-usage"
+alias jj-jc-rotate="journalctl --rotate"
+alias jj-jc-verify="journalctl --verify"          #check for corrupt journals
+alias jj-jc-clean="journalctl  --vacuum-size=200M"
+alias jj-jc-restart="systemctl restart systemd-journald.service"
+
+alias jj-jc="journalctl       -xe"                #last 1000 messages in journal
+alias jj-jc-error="journalctl -u "                #followed by service name eg smb
+
+alias jj-jc-dmesg="journalctl         --dmesg"
+alias jj-jc-boot-list="journalctl     --list-boots"
+alias jj-jc-boot-last="journalctl     --boot=-1"      #last boot
+alias jj-jc-boot-current="journalctl  --boot=0"       #current boot
+alias jj-jc-boot-n="journalctl        --boot="        #jbc-10 gives -10th boot #this wont work
+
+alias jj-sc-bootgrep="jj-jc-boot-current | grep -ve pulseaudio -ve dbus -ve audit -ve gdm-x-session -ve nagios -ive NetworkManager -ve dnsmasq -ve grafana -ve com.redhat -ve influxd -ve smart -ve 'system activity accounting tool' -ve sshd -ve chronyd -ve run-parts -ve nm-dispatcher "
+
+alias jj-jc-sys="journalctl  --reverse --system"
+alias jj-jc-user="journalctl --reverse --user"    #use as jss
+alias jj-jc-jss="journalctl  --user-unit=jss"      #gives nothing, even when logged in as jss
+
+############################################################################
+#yum/dnf/apt:
+
+alias jj-yum-list-update=="dnf list > ~/zz_yum/yum.txt"
+alias jj-yum-list="cat ~/zz_yum/yum..txt"
+alias jj-yum-grep="cat ~/zz_yum/yum.txt | grep"
+
+alias jj-yum-list-all-update=="dnf list > ~/zz_yum/yum.all.txt"
+alias jj-yum-list-all="cat ~/zz_yum/yum.all.txt"
+alias jj-yum-grep-all="cat ~/zz_yum/yum.all.txt | grep"
+
+#el:
+#alias yumd="yum --disablerepo=*"
+#alias yumall="yum --enablerepo=*"
+#el6:
+#alias yumbup="yum --disablerepo=* --enablerepo=base,updates"
+#alias yumbupel="yum --disablerepo=* --enablerepo=base,updates,epel"
+#el7
+#alias dnfbup="dnf --disablerepo=* --enablerepo=base --enablerepo=updates"
+#alias dnfbupel="dnf --disablerepo=* --enablerepo=base --enablerepo=updates --enablerepo=epel"
+#fc17
+#alias yumfup="yum --disablerepo=* --enablerepo=fedora,updates"
+#alias yumfupr="yum --disablerepo=* --enablerepo=fedora,updates,rpmfusion-free,rpmfusion-nonfree"
+#alias yumrpmfusion="yum --disablerepo=* --enablerepo=rpmfusion*"
+
+#fedora:
+alias jj-dnffupr="dnf --disablerepo=* --enablerepo=fedora --enablerepo=updates --enablerepo=rpmfusion-free --enablerepo=rpmfusion-nonfree"
+alias jj-dnffup="dnf --disablerepo=* --enablerepo=fedora --enablerepo=updates"
+
+alias jj-dnfprovides="dnf provides"
+alias jj-dnfprovidesall="dnf enablerepo=* provides"
+
+alias jj-rpm-files="rpm -q --filesbypkg"
+alias jj-rpm-wp="rpm -q --whatprovides"
+alias jj-dnf-filesypkg="dnf repoquery --list"  #--enablerepo=updates   #list files in a package in repo
+
+alias jj-dnf-repos="dnf repolist             #list enabled repositories"
+alias jj-dnf-drepos="dnf repolist disabled"
+
+##############
+#Debian/Ubuntu
+alias jj-apt-search="apt search"             #<package_name>
+alias jj-apt-show="apt show"                 #<package_name>
+alias jj-apt-list="apt list"                 #<package_name>
+alias jj-apt-remove="apt remove"             #<package_name>
+
+alias jj-apt-dpkg-files="dpkg-query -L"      #<package_name>
+
+#To see the files contained in a package NOT installed, do this once (if you haven't installed apt-file already:
+alias jj-apt-files-update="apt-file update"  ##apt-get install apt-file
+alias jj-apt-files="apt-file list"           #<package_name>
+
+#To see the files a .deb file will install
+alias jj-dpkg-files-from-repo="dpkg-deb -c"  #<package_name.deb>
+
+#ubuntu
+alias jj-dpkg-list-all="dpkg-query --list"
+alias jj-dpkg-filesbypkg="dpkg -L"
+alias jj-dpkg-whatprovides="dpkg -S"
+
+############################################################################
+#Github
+
+var_github_dir="/data-ssd/data/development/src/github/"
+alias jj-cd-github="cd \"${var_github_dir}\""
+alias jj-gs='git status '
+alias jj-ga='git add '
+alias jj-gb='git branch '
+alias jj-gc='git commit'
+alias jj-gd='git diff'
+alias jj-go='git checkout '
+alias jj-gk='gitk --all&'
+alias jj-gx='gitx --all'
+alias jj-gpush="git push origin master"  #push updates to repo
+alias jj-gpull="git pull origin master"  #pull updates from repo
+alias jj-git-tags="git tag"
+alias jj-git-branches-local="git branch"
+alias jj-git-branches-remote="git branch -r"
+alias jj-git-branches-all="git branch -a"
+alias got='git '
+alias get='git '
+
+
+alias jj-git-log-patch-diff='git log --patch --word-diff' 
+alias jj-git-clean="git          clean -d -x -f"
+alias jj-git-clean-dryrun="git   clean -d -x -n"
+alias jj-git-stash="git          stash -u"
+alias jj-git-stash-list="git     stash list"
+alias jj-git-stash-show="git     stash show"
+alias jj-git-stash-clear="git    stash clear"
+alias jj-git-stash-pop="git      stash pop"
+
+#git stash list [<options>]
+#git stash show [<stash>]
+#git stash drop [-q|--quiet] [<stash>]
+#git stash ( pop | apply ) [--index] [-q|--quiet] [<stash>]
+#git stash branch <branchname> [<stash>]
+#git stash save [-p|--patch] [-k|--[no-]keep-index] [-q|--quiet]
+#               [-u|--include-untracked] [-a|--all] [<message>]
+#git stash [push [-p|--patch] [-k|--[no-]keep-index] [-q|--quiet]
+#               [-u|--include-untracked] [-a|--all] [-m|--message <message>]]
+#               [--] [<pathspec>...]]
+#git stash clear
+#git stash create [<message>]
+#git stash store [-m|--message <message>] [-q|--quiet] <commit>
+
+############################################################################
+#----------------------------------------------------------------------------
+#docker:
+#config file: ~/.docker/config.json
+#shit stored in /var/lib/docker
+##cd /data-ssd/data/development/os/docker/
+
+alias jj-docker-config="emacs ~/.docker/config.json"
+alias jj-docker-info="docker       info"
+alias jj-docker-imagaes="docker    images"
+alias jj-docker-cls="docker        container ls"        #lists running containerids, same as "docker ps"
+alias jj-docker-clsq="docker       container ls -q"     #no info, only containerids
+alias jj-docker-cps="docker        ps"                  #lists running containerids, same as "docker container ls"
+
+alias jj-docker-login="docker      login docker.io"     #details in passwd file
+alias jj-docker-push="docker       push:"               #docker.io/biggusdockus/quantum:part2
+
+alias jj-docker-cbuild="docker     build -t"            #friendlyhello
+alias jj-docker-crun="docker       run -d"              #-d = daemon, in background   #-p 4000:80 friendlyhello
+alias jj-docker-cstop="docker      container stop"      #containerid
+
+alias jj-docker-ctag="docker       tag"                 #friendlyhello docker.io/biggusdockus/quantum:part2
+alias jj-docker-crmi="docker       rmi"                 #biggusdockus/quantum:part2
+
+alias jj-docker-swarm="docker      swarm init"
+alias jj-docker-sdeploy="docker    stack deploy -c "    #docker-compose.yml getstartedlab
+alias jj-docker-sterm="docker      stack rm"            #getstartedlab     #terminate app
+alias jj-docker-sjoin="docker      swarm join"          #join other machines to an existing swarm
+alias jj-docker-swarmleave="docker swarm leave --force" #terminate the swarm
+
+alias jj-docker-sls="docker service ls"
+alias jj-docker-sps="docker service ps"                 #getstartedlab_web
+
+alias jj-docker-vmcreate="docker-machine create --driver virtualbox"     #myvm1
+alias jj-docker-vmls="docker-machine     ls"
+
+#ssh : example: start swarm manager on vm
+alias jj-docker-vmssh="docker-machine    ssh "          #myvm1 "docker swarm init --advertise-addr <myvm1 ip>"
+
+#tell 2nd vm to join swarm:
+#docker-machine ssh myvm2 "docker swarm join --token <token> <ip>:2377"
+
+alias jj-docker-nls="docker node ls"                    #list nodes (vms) in a swarm
+
+#############################################################################
+#misc
+
+alias jj-collectd-ls="collectdctl listval"
+
+alias jj-vnc-lock-fix="rm /tmp/.X1-lock /tmp/.X11-unix/X1"
+alias jj-vnc-find="find /etc/ -iname *.service | grep vnc"
+
+alias jj-nvidia-fix-video="nvidia-settings --assign CurrentMetaMode=\"HDMI-0: 1920x1080+0+0 { ForceCompositionPipeline = On }\""
+
+alias jj-cnotes="cat ~/notes.txt"
+alias jj-enotes="emacs ~/notes.txt"
+
+#qemu:
+alias jj-qemu-disk-create="qemu-img create -f qcow2" #foobar.qcow2 #50G
+
+#manageig/cloudforms:
+alias jj-miq="docker run --privileged -d -p 8443:443 manageiq/manageiq:fine-4"
+
+#virsh:
+alias jj-virsh-net-edit="virsh-net-edit"
+alias jj-virsh-net-destroy="virsh-net-destroy"
+alias jj-virsh-net-start="virsh net-start"
+
+############################################################################
+#firewall commands:
+#Zones on il-duce: FedoraServer FedoraWorkstation block dmz drop external home internal public trusted work
+#voltaire - c74 -: default zone set to public
+
+alias jj-firewalld-ls="firewall-cmd            --list-all"
+alias jj-firewalld-ls-zone="firewall-cmd       --list-all --zone"              #followed by zone
+alias jj-firewalld-ls-zones-all="firewall-cmd  --list-all-zones | less"
+
+alias jj-firewalld-status="systemctl status firewalld"
+alias jj-firewalld-reload="firewall-cmd --reload"
+
+alias jj-firewalld-stop="systemctl stop firewalld ; systemctl status firewalld "
+alias jj-firewalld-start="systemctl start firewalld ; systemctl status firewalld "
+
+alias jj-firewalld-zone-get-default="firewall-cmd --get-default-zone"    #FedoraWorkstation
+alias jj-firewalld-zone-set-default="firewall-cmd --set-default-zone"
+
+alias jj-firewalld-zones-get="firewall-cmd        --get-zones"
+alias jj-firewalld-zones-get-active="firewall-cmd --get-active-zones"
+
+#transition interface to new zone:
+alias jj-firewalld-zone-change-eth0="firewall-cmd      --zone=new_zone --change-interface=eth0      --zone"
+alias jj-firewalld-zone-change-enp0s31f6="firewall-cmd --zone=new_zone --change-interface=enp0s31f6 --zone"
+
+alias jj-firewalld-get-available-services="firewall-cmd --get-services"  #list of all available services
+
+#following aliases can use --permanent or not:
+alias jj-firewalld-service-list="firewall-cmd           --zone=FedoraWorkstation --list-services"
+alias jj-firewalld-service-add="firewall-cmd            --zone=FedoraWorkstation --add-service" #followed by service
+
+alias jj-firewalld-permanent-service-list="firewall-cmd --zone=FedoraWorkstation --permanent --list-services"
+alias jj-firewalld-permanent-service-add="firewall-cmd  --zone=FedoraWorkstation --permanent --add-service" #followed by service
+
+#default zone:
+alias jj-firewalld-ports-list="firewall-cmd                                --list-ports"
+alias jj-firewalld-port-add="firewall-cmd                                  --add-port"    #5000-5050/tcp
+
+alias jj-firewalld-permanent-ports-list="firewall-cmd          --permanent --list-ports"
+alias jj-firewalld-permanent-port-add="firewall-cmd            --permanent --add-port"    #5000-5050/tcp
+
+#other zones:
+alias jj-firewalld-ports-list-public="firewall-cmd                         --list-ports --zone=public"
+alias jj-firewalld-ports-list-home="firewall-cmd                           --list-ports --zone=home"
+alias jj-firewalld-ports-list-fedoraws="firewall-cmd                       --list-ports --zone=FedoraWorkstation"
+
+alias jj-firewalld-permanent-ports-list-public="firewall-cmd   --permanent --list-ports --zone=public"
+alias jj-firewalld-permanent-ports-list-home="firewall-cmd     --permanent --list-ports --zone=home"
+alias jj-firewalld-permanent-ports-list-fedoraws="firewall-cmd --permanent --list-ports --zone=FedoraWorkstation"
+
+alias jj-firewalld-port-add-public="firewall-cmd                         --zone=public             --add-port"
+alias jj-firewalld-port-add-home="firewall-cmd                           --zone=home               --add-port "
+alias jj-firewalld-port-add-fedoraws="firewall-cmd                       --zone=FedoraWorkstation  --add-port"
+
+alias jj-firewalld-permanent-port-add-public="firewall-cmd   --permanent --zone=public             --add-port "
+alias jj-firewalld-permanent-port-add-home="firewall-cmd     --permanent --zone=home               --add-port"
+alias jj-firewalld-permanent-port-add-fedoraws="firewall-cmd --permanent --zone=FedoraWorkstation  --add-port "
+
+############################################################################
+
+#Everything seems to work if functions are defined after aliases.
+#
+#This allows functions to make use of all (previously defined) aliases.
+#And, aliases can use functions that are defined later, even though the aliases are defined before the 
+#functions exist - because the aliases are not evaluated until they are used, by which time the function has been defined.
+#
+#There should be a problem with this setup if you have a function B which uses an alias A which in turn 
+#uses a function C defined later in the functions file than B. When B is instantiated, it will try to evaluate 
+#alias A, but A references function C which hasn't been defined yet. But somehow even this still works.
+alias aliasA="functionC"           #aliasA is used by functionB, defined before functionC. Wow. It works.
+alias check_aliastest="aliastest"  #check_aliastest references function aliastest defined later. Works.
+
+for i in ~/.bashrc_jss ~/.bashrc_functions ; do 
+    if [[ -e "${i}" ]] ; then 
+	#echo "Sourcing ${i}"
+	source "${i}" 
+    fi
+done
+
+#echo "PWD="`pwd`
+#echo "  Finished" ~/.bashrc_aliases
+
+
+

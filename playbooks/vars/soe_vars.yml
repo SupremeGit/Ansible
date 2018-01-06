@@ -1,0 +1,73 @@
+---
+
+centos_local_repofile: "/etc/ansible/files/system/centos-local.repo"
+fedora_local_repofile: "/etc/ansible/files/system/fedora-local.repo"
+
+#path to stat on hosts to see if epel is installed:
+epel_repofile_path: "/etc/yum.repos.d/epel.repo"
+epel_repo_gpg_key_url: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}"
+
+puppet_repofile: "/etc/yum.repos.d/puppet5.repo"
+puppet_repofile_el7: "/etc/ansible/files/system/puppet5.el7.repo"
+puppet_repofile_fedora: "/etc/ansible/files/system/puppet5.fedora.repo"
+puppet_repo_gpg_key_url: "https://yum.puppetlabs.com/RPM-GPG-KEY-puppet"
+
+my_soe_repo: "https://github.com/SupremeGit/puppet.git"
+#Easier to use https as ssh requires copying my ssh key (id_rsa) to client /root/.ssh/
+#my_soe_repo: "git@github.com:SupremeGit/puppet.git"
+
+puppet_src: /etc/puppetlabs/code/environments/github
+
+key_soe_apps_list:
+  - "openssh-server"
+  - "collectd"
+  - "git"
+  - "emacs"
+
+puppet_list:
+  - "puppet5-release"
+  - "puppetserver"
+  - "puppet-agent"
+
+key_soe_groups_list_f27:
+  - "@Xfce Desktop"
+
+key_soe_apps_list_redhat:
+  - "openssh"
+  - "nrpe"
+  - "nagios-plugins-procs"
+  - "nagios-plugins-ssh"
+  - "nagios-plugins-http"
+  - "nagios-plugins-load"
+  - "nagios-plugins-disk"
+  - "nagios-common"
+  - "nagios-plugins-users"
+  - "nagios-plugins"
+  - "nagios-plugins-swap"
+
+key_soe_apps_list_debian:
+  - nagios-nrpe-server
+  - monitoring-plugins-basic
+  - nagios-plugins
+  
+#nagios-plugins    #should pull in other monitoring-plugins:
+#
+#monitoring-plugins
+#monitoring-plugins-basic     #this has got the important stuff.
+#monitoring-plugins-common
+#monitoring-plugins-standard
+
+#  - "nagios-nrpe-plugin"   #goddammit, this allows you to execute nrpe plugins on remote hosts, its not the client plugin
+#  - "nrpe-ng"              #try this ng one later:
+
+key_soe_apps_list_el7:
+  - "bash"   #dummy value
+    
+key_soe_apps_list_fedora:
+  - "python-firewall"
+  
+key_apps_list:
+  - "strace"
+  - "rsync"  
+  - "cockpit"
+  

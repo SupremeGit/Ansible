@@ -1,0 +1,148 @@
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+# The following lines are desirable for IPv6 capable hosts
+#::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+#::1     ip6-localhost ip6-loopback
+#fe00::0 ip6-localnet
+#ff00::0 ip6-mcastprefix
+#ff02::1 ip6-allnodes
+#ff02::2 ip6-allrouters
+
+#block:
+127.0.0.1       master.urbanterror.info master2.urbanterror.info master.quake3arena.com melbourneitmirror.net 
+
+#54.206.61.158	il-duce.homunculoid.com
+
+#static:
+192.168.1.1     linksys.local.vorpal	linksys
+192.168.1.100   il-duce.local.vorpal 	il-duce.vorpal.org	il-duce
+192.168.1.102   ps3.local.vorpal 	ps3
+192.168.1.110   viera.local.vorpal	viera
+192.168.1.111   viera-br.local.vorpal 	viera-br
+192.168.1.112   dali.local.vorpal	dali
+192.168.1.115   t1.local.vorpal		t1       #study
+192.168.1.116   t2.local.vorpal		t2       #lounge
+192.168.1.117   t3.local.vorpal		t3       #bathroom
+
+#150-200 are reserved for dhcp on router
+#these are reserved/fixed by MAC address:
+#192.168.1.150   il-duce.vorpal.org il-duce
+192.168.1.150   moomin,local.vorpal	moomin
+192.168.1.151   boudoir.local.vorpal 	boudoir
+192.168.1.152   mobster.local.vorpal 	mobster
+192.168.1.153   fuji.local.vorpal 	fuji
+
+192.168.1.221   moomin-pxe.local.vorpal moomin-pxe
+
+#having own hostname here will slow down sendmail on boot
+
+###need to resolve own hostname via (dns) nameserver set by dhclient in /etc/resolv.conf, or dig fails & sendmail slow.
+
+#ipa network:       /ipa.vorpal/  192.168.124.1
+192.168.124.100     c72.ipa.vorpal		c72
+
+#default network:   /default.vorpal/ 192.168.122.1
+#dhcp range 235-254
+192.168.122.20	    rhevm-host.default.vorpal 		rhevm-host
+192.168.122.21	    rhevm.default.vorpal 		rhevm
+192.168.122.172	    rhev-guest-02.default.vorpal	rhev-guest-02
+192.168.122.233	    rhev-vm01.default.vorpal 		rhev-vm01
+#ubuntu vm is in here somewhere
+#above did have vorpal.org
+
+#ovirt.vorpal network:     /ovirt.vorpal/  192.168.123.1
+#dhcp range is 135-254
+#192.168.123.201    ovirt-engine-host.ovirt.vorpal ovirt-engine-host.vorpal.org	ovirt-engine-host
+192.168.123.10	    ovirt-engine-host.ovirt.vorpal ovirt-engine-host.vorpal.org	ovirt-engine-host
+192.168.123.11	    ovirt-engine.ovirt.vorpal ovirt-engine.vorpal.org		ovirt-engine
+192.168.123.21	    ovirt-host-01.ovirt.vorpal ovirt-host-01.vorpal.org		ovirt-host-01
+192.168.123.31      ovirt-node-01.ovirt.vorpal ovirt-node-01.vorpal.org         ovirt-node-01
+
+192.168.123.50	    vcenter.ovirt.vorpal vcenter.vorpal.org			vcenter
+192.168.123.51	    esxi-01.ovirt.vorpal esxi-01.vorpal.org			esxi-01
+192.168.123.52	    esxi-02.ovirt.vorpal esxi-02.vorpal.org			esxi-02
+
+#fuck. same hs hv below:
+192.168.123.60      nutanix01.ovirt.vorpal nutanix01.vorpal.org		nutanix01
+#were on .123.x vorpal.org
+192.168.123.60	    hv2016-01.ovirt.vorpal hv2016-01.vorpal.org		hv2016-01
+
+#change to 123.80
+192.168.122.50	    openindiana-01.ovirt.vorpal openindiana-01.vorpal.org	openindiana-01
+
+#putin & rawhide also have nics on default.vorpal network, voltaire does not
+192.168.123.90	    putin.ovirt.vorpal		putin
+192.168.123.91      rawhide.ovirt.vorpal	rawhide
+192.168.123.95      voltaire.ovirt.vorpal	voltaire
+
+192.168.123.130     ovirt-vm01.ovirt.vorpal ovirt-vm01.vorpal.org     ovirt-vm01
+192.168.123.131     ovirt-vm02.ovirt.vorpal ovirt-vm02.vorpal.org     ovirt-vm02
+192.168.123.133     ovirt-vm03.ovirt.vorpal ovirt-vm03.vorpal.org     ovirt-vm03
+
+######change everything on .123 to ovirt.vorpal
+
+
+#windows ad domain: /dns.vorpal/  192.168.110.70
+192.168.110.70	    sv2016-01-i-dc.ad.dns.vorpal	sv2016-01-i-dc
+192.168.110.75	    sv2016-02-i.ad.dns.vorpal		sv2016-02-i
+192.168.1.70	    sv2016-01-dc.ad.dns.vorpal		sv2016-01-dc
+192.168.1.75	    sv2016-02.ad.dns.vorpal		sv2016-02
+
+#soe.vorpal network:       /soe.vorpal/         192.168.125.1
+
+
+#he suite, use full name lago-he-basic-suite-4-1-engine for admin webpage, engine does not work
+#192.168.200.99	    engine
+#192.168.200.99	    lago-he-basic-suite-4-1-engine.lago.local	lago-he-basic-suite-4-1-engine
+#192.168.200.4          lago-he-basic-suite-4-1-storage
+#192.168.200.3          lago-he-basic-suite-4-1-host0
+#192.168.200.2          lago-he-basic-suite-4-1-host1
+
+#basic suite - use engine for admin webpage
+192.168.201.2           lago-basic-suite-4-1-engine engine
+#nice. webmin works but not in google-chrome only firefox
+
+
+#basic suite - use engine for admin webpage
+#192.168.202.99	    lago-basic-suite-4-1-engine.lago.local	lago-basic-suite-4-1-engine
+#192.168.202.2          lago-basic-suite-4-1-engine engine
+#192.168.202.3          lago-basic-suite-4-1-host1
+#192.168.202.4          lago-basic-suite-4-1-host0
+
+#192.168.207.99	    lago-he-basic-suite-4-0-engine.lago.local	lago-he-basic-suite-4-0-engine engine
+#192.168.207.2          lago-he-basic-suite-4-0-storage
+#192.168.207.4          lago-he-basic-suite-4-0-host0
+#192.168.207.3          lago-he-basic-suite-4-0-host1
+
+
+#dont use unqualified engine, use fqdn
+#192.168.204.99	    lago-he-basic-suite-4-0-engine.lago.local	lago-he-basic-suite-4-0-engine
+#192.168.204.2          lago-he-basic-suite-4-0-storage
+#192.168.204.4          lago-he-basic-suite-4-0-host0
+#192.168.204.3          lago-he-basic-suite-4-0-host1
+
+#192.168.200.99	    lago-he-basic-suite-4-0-engine.lago.local	lago-he-basic-suite-4-0-engine
+#192.168.200.2          lago-he-basic-suite-4-0-storage
+#192.168.200.4          lago-he-basic-suite-4-0-host0
+#192.168.200.3          lago-he-basic-suite-4-0-host1
+
+
+
+#old:
+
+#172.18.92.10   rl2-sv-el6.rl2
+#172.18.92.100  rl2-ws-el6.rl2
+#172.18.92.101  rl2-sv-el7.rl2
+
+#172.18.93.15  01-sv-ipa-el6.rl2
+#172.18.93.101 01-ws-ipa-el6.rl2
+
+#172.18.94.20  02-sv-ipa-1-el7.rl2
+#172.18.94.101 02-sv-ipa-2-el7.rl2
+
+#172.18.95.25  03-sv-nt4ld-el6.rl2
+#172.18.95.101 03-ws-nt4ld-el6.rl2
+
+#192.168.122.247     gs-server
+#192.168.122.247     rl2-server-el6
+#192.168.122.80      gs-ws10
+#192.168.122.80      rl2-ws-el6

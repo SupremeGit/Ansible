@@ -1,0 +1,38 @@
+#!/bin/sh
+
+LOGDIR=~/".vnc/logs"
+mkdir -p "${LOGDIR}"
+me=$(basename "${BASH_SOURCE}")
+LOG="${LOGDIR}/${me}${DISPLAY}.log"
+
+echo "Running $me" > "${LOG}" 2>&1
+
+env | sort > "${LOG}.env.txt" 2>&1
+unset SESSION_MANAGER
+unset DBUS_SESSION_BUS_ADDRESS
+
+source /etc/profile  >> "${LOG}" 2>&1
+#pulls in /etc/profile.d/kde.sh and /etc/profile.d/qt.sh
+#ensure the following vars are set when we start kde apps from xfce panel etc:
+#KDEDIRS=/usr
+#QTblah
+
+source ~/.vnc/xstartup-common.sh >> "${LOG}" 2>&1
+
+function start_session () {
+#choose a session:
+    echo "Running xstartup start-session"
+
+    #old faithful
+    /usr/bin/xfce4-session
+
+    #kde may refuse to run in vnc if its running on real displays already.
+    #start_kde_old
+    #start_kde_new
+
+    #/usr/local/e/bin/enlightenment_start
+
+    #exec /etc/X11/xinit/xinitrc
+}
+
+start_session >> "${LOG}" 2>&1

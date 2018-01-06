@@ -1,0 +1,30 @@
+---
+
+#once we have ssh key we can gather facts i think:
+
+#EL7.4 doesn't seem to need anything.
+#- name: Yum install python2-yum (EL7)
+#  command: yum --assumeyes install python2-yum
+#  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version > '7'
+#  tags: ansible_requirements,python2-dnf
+
+- name: Install python2-dnf (EL8+)
+  command: dnf --assumeyes install python2-dnf
+  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version > '7'
+  tags: ansible_requirements,python2-dnf
+
+- name: Install python2-dnf (Fedora)
+  command: dnf --assumeyes install python2-dnf
+  when: ansible_os_family == "RedHat" and ansible_distribution == "Fedora"
+  tags: ansible_requirements,python2-dnf
+  
+- name: Apt-get install python
+  command: apt-get --assume-yes install python
+  when: ansible_os_family == "Debian"
+  tags: ansible_requirements,python
+
+- name: Apt-get install python-apt
+  command: apt-get --assume-yes install python-apt
+  when: ansible_os_family == "Debian"
+  tags: ansible_requirements,python-apt
+
