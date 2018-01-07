@@ -338,6 +338,12 @@ alias jj-virsh-net-edit="virsh-net-edit"
 alias jj-virsh-net-destroy="virsh-net-destroy"
 alias jj-virsh-net-start="virsh net-start"
 
+alias jj-virsh-list-all="virsh list --all"
+alias jj-virsh-list-inactive="virsh list --inactive"
+alias jj-virsh-list-running="virsh list --state-running"
+alias jj-virsh-list-paused="virsh list --state-paused"
+alias jj-virsh-list-shutoff="virsh list --state-shutoff"
+
 ############################################################################
 #firewall commands:
 #Zones on il-duce: FedoraServer FedoraWorkstation block dmz drop external home internal public trusted work
@@ -403,12 +409,6 @@ alias jj-firewalld-permanent-port-add-fedoraws="firewall-cmd --permanent --zone=
 #This allows functions to make use of all (previously defined) aliases.
 #And, aliases can use functions that are defined later, even though the aliases are defined before the 
 #functions exist - because the aliases are not evaluated until they are used, by which time the function has been defined.
-#
-#There should be a problem with this setup if you have a function B which uses an alias A which in turn 
-#uses a function C defined later in the functions file than B. When B is instantiated, it will try to evaluate 
-#alias A, but A references function C which hasn't been defined yet. But somehow even this still works.
-alias aliasA="functionC"           #aliasA is used by functionB, defined before functionC. Wow. It works.
-alias check_aliastest="aliastest"  #check_aliastest references function aliastest defined later. Works.
 
 for i in ~/.bashrc_jss ~/.bashrc_functions ~/.bashrc_ansible; do 
 #for i in ~/.bashrc_jss ~/.bashrc_functions ; do 

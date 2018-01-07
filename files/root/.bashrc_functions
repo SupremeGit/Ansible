@@ -5,9 +5,6 @@
 
 ############################################################################
 #misc
-function aliastest () { echo balls ; }
-function functionB () { aliasA ; }
-function functionC () { echo "balls" ; }
 
 function mcd () {
     mkdir -p $1
@@ -69,8 +66,6 @@ function jj-finddir () {
    dir="$1" ; shift
    find "${dir}" -iname "$@"
 }
-
-#alias jj-clean="find '.' -iname '*~' -print -delete"  #use jj-cleandir .
 function jj-cleandir () {
     check_argcount $# 1
     dir="$1" ; shift
@@ -112,7 +107,6 @@ function jj-env-stdin () {
 
 ############################################################################
 #systemd
-
 function jj-sc-sv-operation-status () {
     #usage:   jj-sc-operation-status service operation
     #does operation (start, stop, restart, reload, etc), followed by status, for the specified service
@@ -121,10 +115,10 @@ function jj-sc-sv-operation-status () {
     systemctl "$operation" "$service"
     systemctl status "$service"
 }
-
 function jj-sc-start   () { jj-sc-sv-operation-status "$1" start ; }
 function jj-sc-restart () { jj-sc-sv-operation-status "$1" restart ; }
 
+#vnc servers:
 vnc_path="/etc/systemd/system/multi-user.target.wants"
 function jj-vnc-all-op () {
     #usage:   jj-vnc-all-op operation   
@@ -174,6 +168,21 @@ function jj-vnc-sv-op-status () {
     jj-vnc-sv-op "${sv_display}" status
 }
 
+#libvirt
+function jj-virt-status () {
+    systemctl status libvirtd
+}
+function jj-virt-restart () {
+    ( systemctl stop libvirtd ) &
+    sleep 5
+    killall -TERM libvirtd
+    sleep 5
+    killall -KILL libvirtd
+    systemctl start libvirtd
+    systemctl status libvirtd
+    virsh list --all
+}
+
 ############################################################################
 #yum/dnf/apt
 
@@ -197,7 +206,6 @@ function jj-kernel-list-available {
     echo cmd="$cmd"
     $cmd
 }
-
 function jj-kernel-list-installed {
     rpm -q kernel | sort
 }
@@ -205,6 +213,7 @@ function jj-kernel-list-installed-all {
     #[[ kernel-4.14.5-200.fc26.x86_64 =~ kernel-[0-9].* ]] && echo matched
     rpm -qa | grep kernel | grep -v kerneloops | grep -v http-kernel | grep -v texlive | sort
 }
+
 kernel_pkg_names="kernel kernel-core kernel-debug-devel kernel-devel kernel-modules"
 kernel_pkg_names_extra="kernel-headers kernel-tools"
 function jj-kernel-remove () {
@@ -219,6 +228,8 @@ function jj-kernel-remove () {
 alias jj-kernel-grub-ls="cat /etc/grub2.cfg | grep -i menuentry | grep -i Fedora | grep -v rescue | sort | cut -f2 -d \'"
 alias jj-kernel-stable="jj-kernel-grub-ls | head -n 1"
 alias jj-kernel-new="jj-kernel-grub-ls | tail -n 1"
+
+#need a function to get the default, as stupid grub2-tools-minimal does not provide it.
 
 function jj-kernel-grub () {
     #example: "grub2-set-default 'Fedora (4.9.13-201.fc25.x86_64) 25 (Workstation Edition)'"
@@ -237,15 +248,12 @@ function jj-kernel-grub-new () {
     jj-kernel-grub "$kernel"
 }
 
-#need a function to get the default, as stupid grub2-tools-minimal does not provide it.
-
 ############################################################################
 #Can use all funtions defined above on cmdline after sourcing this script, 
 #but to use any of these functions in following scripts
 #we need to export them with -f:
 #This will contaminate the environment with horrid BASH_FUNC garbage though.
 #So let's not export any functions, unless we have to.
-#export -f jj-diff-sbs jj-diff-sbs-spaces jj-diff-sbs-all
 
 ############################################################################
 #echo "PWD="`pwd`
