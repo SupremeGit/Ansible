@@ -12,7 +12,7 @@
 
 #soe-vm-control.sh operates on a group of vms defined from a libvirt template:
 #  available operations: create, define, undefine, define, reimage, refresh, start, destroy, save. restore, shutdown, reboot, reset
-TOOL_DIR="/data-ssd/data/development/src/github/ansible-soe/virt-soe"
+TOOL_DIR="/data-ssd/data/development/src/github/ansible-soe/virt/virt-soe"
 soe_vm_control_script="${TOOL_DIR}/soe-vm-control.sh"
 
 #ansible hosts/vault/playbook config:
