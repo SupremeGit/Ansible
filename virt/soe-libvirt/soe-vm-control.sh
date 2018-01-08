@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+scriptname="soe-vm-control.sh"
 # Script to control our vms
 #
 # Works on libvirt template files which specify a bunch of vms in a group (domain)
@@ -10,7 +10,6 @@
 #  - disk image set to match: ${VM_DIR}/${domain}/${vmname}.qcow2 eg: <source file='/data-ssd/data/kvm/vm/soe.vorpal/new.qcow2'/>
 
 #DEBUG=echo 
-
 vmnames="foo bar"
 domain="soe.vorpal"
 
@@ -31,9 +30,9 @@ BLANK_IMAGE="${IMAGE_DIR}/25G.qcow2"               #blank, sparse image, small &
 BALLS=Salty ; debug=0 ;  help=0 ; ok=1
 usage () {
     echo
-    echo "soe_create_vms.sh"
+    echo "${scriptname}"
     echo 
-    echo "Usage > soe_create_vms.sh --vms \"vm1 vm2 ...\" [operation]"
+    echo "Usage > ${scriptname} --vms \"vm1 vm2 ...\" [operation]"
     echo
     echo "      -h | --help                     Lists this usage information."
     echo "      -d | --debug                    Echo the commands that will be executed."

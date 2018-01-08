@@ -279,7 +279,7 @@ alias jj-git-stash-pop="git      stash pop"
 
 alias jj-docker-config="emacs ~/.docker/config.json"
 alias jj-docker-info="docker       info"
-alias jj-docker-imagaes="docker    images"
+alias jj-docker-images="docker     images"
 alias jj-docker-cls="docker        container ls"        #lists running containerids, same as "docker ps"
 alias jj-docker-clsq="docker       container ls -q"     #no info, only containerids
 alias jj-docker-cps="docker        ps"                  #lists running containerids, same as "docker container ls"
@@ -292,17 +292,38 @@ alias jj-docker-crun="docker       run -d"              #-d = daemon, in backgro
 alias jj-docker-cstop="docker      container stop"      #containerid
 
 alias jj-docker-ctag="docker       tag"                 #friendlyhello docker.io/biggusdockus/quantum:part2
-alias jj-docker-crmi="docker       rmi"                 #biggusdockus/quantum:part2
+alias jj-docker-crmi="docker       rmi"                 #biggusdockus/quantum:part2              #remove images
 
 alias jj-docker-swarm="docker      swarm init"
 alias jj-docker-sdeploy="docker    stack deploy -c "    #docker-compose.yml getstartedlab
-alias jj-docker-sterm="docker      stack rm"            #getstartedlab     #terminate app
+alias jj-docker-sterm="docker      stack rm"            #getstartedlab     #terminate app        #remove container
 alias jj-docker-sjoin="docker      swarm join"          #join other machines to an existing swarm
 alias jj-docker-swarmleave="docker swarm leave --force" #terminate the swarm
 
 alias jj-docker-sls="docker service ls"
 alias jj-docker-sps="docker service ps"                 #getstartedlab_web
 
+#docker ps -aq --all              #view all containers
+#       can use -f for filter with status=(created|restarting|running|paused|exited|dead)
+alias jj-docker-container-list-exited="docker ps -aq -f status=exited"   #view with filter for exited containers
+alias jj-docker-container-list-dead="docker ps -aq -f status=dead"
+alias jj-docker-container-list-created="docker ps -aq -f status=created"
+alias jj-docker-container-list-running="docker ps -aq -f status=running"
+
+
+function jj-docker-run-interactive () {
+    snapshot="${1}"
+    #docker commit 12345678904b5 mysnapshot
+    ## explore this filesystem using bash (for example)
+    docker run --tty --interactive "${snapshot}" /bin/bash
+    #docker rmi mysnapshot
+}
+
+#tag images:
+#docker tag soe.vorpal_fedora soe.vorpal_fedora:01
+
+
+#docker machine:
 alias jj-docker-vmcreate="docker-machine create --driver virtualbox"     #myvm1
 alias jj-docker-vmls="docker-machine     ls"
 

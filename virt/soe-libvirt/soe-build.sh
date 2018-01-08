@@ -1,19 +1,20 @@
 #!/bin/bash
-# -*- mode: sh; -*-
-# soe_build_vms.sh - script to sequence some ops using:
-#    soe_create_vms.sh to: maniupulate libvirt vms
+scriptname="soe-build.sh"
+# soe-build.sh - script to sequence some ops using:
+#    soe-vm-control.sh to: maniupulate libvirt vms
 #    several ansible playbooks to connect & install soe on hosts 
 #
 # Can call this script like:
-#    ~/src/github/virt-tools/virt-soe/soe-build.sh --vms "centos7 fedora"
+#    ./soe-build.sh --vms "centos7 fedora"
 # The soe-vm-control script is alao called like:
-#    ~/src/github/virt-tools/virt-soe/soe-vm-control.sh status   --vms "centos7 fedora temp foo bar ubuntu ubuntu_server"
+#    ./soe-vm-control.sh status   --vms "centos7 fedora temp foo bar ubuntu ubuntu_server"
 # If present, --vms "foo bar" must be the last parameter
 
 #soe-vm-control.sh operates on a group of vms defined from a libvirt template:
 #  available operations: create, define, undefine, define, reimage, refresh, start, destroy, save. restore, shutdown, reboot, reset
 TOOL_DIR="/data-ssd/data/development/src/github/ansible-soe/virt/soe-libvirt"
 soe_vm_control_script="${TOOL_DIR}/soe-vm-control.sh"
+scriptname="soe-build.sh"
 
 #ansible hosts/vault/playbook config:
 var_playbook_connect="/etc/ansible/playbooks/connect-host.yml"       #${var_playbook_connect}
@@ -45,7 +46,7 @@ function soe-set-vm_names () {
     export vm_fq_names
 }
 function usage () {
-    echo "Usage:"
+    echo "Usage: ${scriptname}"
     exit
 }
 
