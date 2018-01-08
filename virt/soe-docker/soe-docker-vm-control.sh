@@ -45,9 +45,11 @@ usage () {
     echo "Operations:"
     #echo "      status"
     echo
-    echo "      build         Build base image."
-    echo "      run           Run VM."
-    echo "      commit        Commit changes made to a new image."
+    echo "      build              Build base image."
+    echo "      run                Run VM."
+    echo "      refresh            Start from standard base os image."
+    echo "      reimage            Start from original image"
+    #echo "      commit        Commit changes made to a new image."
     #echo "      update        Update container's post-boot setup script /soe/scripts/vmname-run-soe.sh"
     echo "      "
     echo "Todo:"
@@ -66,7 +68,7 @@ function process_args () {
             -h | help)        usage;;
             -d | --debug)     export debug=1; export DEBUG=echo ; echo -e "\nDebug mode on.";;
             #status | create | define | undefine | reimage | refresh | start | destroy | save | restore | shutdown | reboot | reset )
-            build | run | update)      operation="${1}" ; echo -e "Executing operation: $1.";;
+            build | run | reimage | refresh)      operation="${1}" ; echo -e "Executing operation: $1.";;
 	    --vms)            ok=1 ; vmnames="$2"  ; echo "Operating on vms: ${vmnames}" ; shift ;;
 	    --domain)         domain="$2"  ; echo "Operating on domain: ${domain}" ; shift ;;
             *)                ok=0 ; echo "Unrecognised option." ;  usage ;;
@@ -77,112 +79,13 @@ function process_args () {
     if [ $ok -eq 0 ] ; then echo "Halp. Something isn't right with the command arguments. Exiting." ; usage ; fi
     echo
 }
-
-function vm_op_all () {
-    operation="$1"
-    for i in ${vmnames} ; do 
-	echo "${i}:"
-	$DEBUG docker "${operation}"
-    done
-}
-
-function vm_op_build () {
-    #build image, view build images with "docker images"
-    #REPOSITORY                       TAG                 IMAGE ID            CREATED             SIZE
-    #soe.vorpal_fedora                latest              4c22b1cddd1b        17 seconds ago      3.71 kB
-
-    #operation="build --no-cache -t "          #use --no-cache to force fresh build:
-    operation="build -t"
-    for i in ${vmnames} ; do 
-	echo "${i}:"
-	$DEBUG docker ${operation} "${domain}_${i}" "${TEMPLATE_DIR}/${i}/"
-    done
-}
-
-function vm_op_run () {
-    #operation="run"                       #leave old ocntainers around so we can examine fs etc.
-    operation="run --rm"                   #--rm removes old containers after they exit
-    #operation="run --detach"              #don't see output if we detach
-    for i in ${vmnames} ; do 
-	echo "Run ${i}:"
-	#if no command specified, default is to 
-	operation+=" --hostname ${i}"
-	$DEBUG docker ${operation}  "${domain}_${i}:latest"
-	#$DEBUG docker ${operation} "${domain}_${i}:00"    #run image prepared earlier
-	#$DEBUG docker ${operation} "${domain}_${i}:01"    #run image prepared earlier
-	#$DEBUG docker ${operation} "${domain}_${i}:02"    #run image prepared earlier
-	#$DEBUG docker ${operation} "${domain}_${i}"       #run default bootup cmd specified in Dockerfile "/soe/scripts/fedora-run.sh"
-	#$DEBUG docker ${operation} "${domain}_${i}"      "/soe/scripts/fedora-run-soe.sh"
-    done
-}
-
 #################
 
-function check_operation_retry () {
-    op="$1"
-    if [[ "meh" == *"${op}"* ]] ; then 
-	echo "Valid retry operation: ${op}"
-	return 1;
-    else
-	return 0
-    fi
-}
-function check_operation () {
-    op="$1"
-    if [[ "meh" == *"${op}"* ]] ; then 
-	echo "Valid normal operation: ${op}"
-	return 1;
-    else
-	return 0
-    fi
-}
-
-function check_xml_operation () {
-    op="$1"
-    if [[ "maybebuild" == *"${op}"* ]] ; then 
-	echo "Valid xml_file operation: ${op}"
-	return 1;
-    else
-	return 0
-    fi
-}
-function retry () {
-    vmname="$1"
-    operation="$2"
-    RETRIES=3
-    for j in 1 to ${RETRIES} ; do 
-
-	#docker:
-	$DEBUG docker ${operation} "${domain}_${vmname}"
-
-	status=$?
-	if [[ ${status} -ne 0 ]] ; then 
-	    echo "Retrying "
-	    sleep ${LIBVIRT_DELAY}
-	else
-	    break
-	fi
-    done
-}
 function vm_op_all () {
     operation="$1"
     for i in ${vmnames} ; do 
 	echo "${i}:"
 	$DEBUG docker ${operation} "${domain}_${i}"
-    done
-}
-function vm_op_all_retry () {
-    operation="$1"
-    for i in ${vmnames} ; do 
-	echo "${i}:"
-	retry "${i}" "${operation}"
-    done
-}
-function vm_xml_op_all () {
-    operation="$1"
-    for i in ${vmnames} ; do 
-	echo "${i}:"
-	$DEBUG docker ${operation} "${TEMPLATE_DIR}/${i}-docker-compose.yml"
     done
 }
 function vm_reimage () {
@@ -205,6 +108,42 @@ function vm_refresh_all () {
     done
 }
 
+function vm_op_build_all () {
+    #build image, view build images with "docker images"
+    #REPOSITORY                       TAG                 IMAGE ID            CREATED             SIZE
+    #soe.vorpal_fedora                latest              4c22b1cddd1b        17 seconds ago      3.71 kB
+
+    #operation="build --no-cache -t "          #use --no-cache to force fresh build:
+    operation="build -t"
+    for i in ${vmnames} ; do 
+	echo "${i}:"
+	$DEBUG docker ${operation} "${domain}_${i}" "${TEMPLATE_DIR}/${i}/"
+    done
+}
+
+function vm_op_run_all () {
+    #operation="run"                       #leave old ocntainers around so we can examine fs etc.
+    operation="run --rm"                   #--rm removes old containers after they exit
+    #operation="run --detach"              #don't see output if we detach
+    for i in ${vmnames} ; do 
+	echo "Run ${i}:"
+	#if no command specified, default is to 
+	operation+=" --hostname ${i}"
+	$DEBUG docker ${operation}  "${domain}_${i}:latest"
+	#$DEBUG docker ${operation} "${domain}_${i}:00"    #run image prepared earlier
+	#$DEBUG docker ${operation} "${domain}_${i}"       #run default bootup cmd specified in Dockerfile "/soe/scripts/fedora-run.sh"
+	#$DEBUG docker ${operation} "${domain}_${i}"      "/soe/scripts/fedora-run-soe.sh"
+    done
+}
+function vm_op_loop () {
+    operation="run --rm"
+    for i in ${vmnames} ; do 
+	echo "Run ${i}:"
+	operation+=" --hostname ${i}"
+	#$DEBUG docker ${operation}  "${domain}_${i}:latest"
+	$DEBUG docker ${operation} "${domain}_${i}"      "/soe/scripts/fedora-run-sshd.sh"  #run sshd under process manager: monit or supervisord
+    done
+}
 function set-x-on () {
     set -x
 }
@@ -218,12 +157,15 @@ process_args "$@"
 #vm_all
 if [[ $( check_operation "${operation}" ) ]] ; then 
     vm_op_all "${operation}"
-elif [[ $( check_operation_retry "${operation}" ) ]] ; then 
-    vm_op_all_retry "${operation}"
 elif [[ "${operation}" == "build" ]] ; then 
-    vm_op_build
+    vm_op_build_all
 elif [[ "${operation}" == "run" ]] ; then 
-    vm_op_run
+    vm_op_run_all
+elif [[ "${operation}" == "reimage" ]] ; then 
+    vm_op_reimage_all
+
+elif [[ "${operation}" == "refresh" ]] ; then 
+    vm_op_refresh_all
 else 
     echo "Hmm. Unknown operation: ${operation}"
 fi
