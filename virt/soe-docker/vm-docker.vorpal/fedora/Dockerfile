@@ -29,6 +29,9 @@ RUN sleep 10
 RUN dnf install --assumeyes net-tools
 RUN dnf install --assumeyes hostname
 RUN dnf install --assumeyes openssh-server
+RUN dnf install --assumeyes monit
+#RUN dnf install --assumeyes tigervnc-server
+
 
 # Make port 22 available to the world outside this container
 EXPOSE 22

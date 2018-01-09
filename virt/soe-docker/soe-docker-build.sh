@@ -173,11 +173,6 @@ function sequence-test () {
     echo "Running test sequence of commands:"   #comment or uncomment as desired:
     #soe-vm-control-vms "status"
 }
-function sequence-vm () {
-    #vm_names="fedora"
-    echo "Running test sequence of commands on vms: ${vm_names}"   #comment or uncomment as desired:
-    #soe-vm-control "status" --vms "${vm_names}"
-}
 #set-x-on
 ########################################Start invoking commands here:
 #when not set here, vm_names and vm_fq_names are taken from environment, or from $@:
@@ -187,10 +182,9 @@ msg_start
 
 #soe-vm-control-vms "undefine"      #Wipes working and current images.
 
-sequence-full
-#sequence-partial
+sequence-full                       #Put as much soe config as possible in Dockerfile, and build here. Past ops are cached so should be fast.
+#sequence-partial                   #Update & run soe script & other ad-hoc commands
 #sequence-test 
-###sequence-vm
 
 #soe-vm-control-vms "create"         #Create container from image: working."
 
