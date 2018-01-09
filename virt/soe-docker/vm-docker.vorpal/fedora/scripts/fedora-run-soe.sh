@@ -1,5 +1,6 @@
 #!/bin/bash
-# This script runs on launch, command is specified in the dockerfile 
+# This script is run manually to install our soe from within docker image.
+# Although most steps should be done with Dockerfile to make containers easier to rebuild etc.
 
 hostname=`hostname`
 LOGFILE="/root/${hostname}-run-soe.txt"

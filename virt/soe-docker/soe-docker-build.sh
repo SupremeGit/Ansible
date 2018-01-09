@@ -89,7 +89,11 @@ function soe-vm-control-vms () {
     operation=$1 ; shift ;
     #echo "VMs: ${vm_fq_names}"
     #echo "${operation}:   $@"
-    ${soe_vm_control_script} --domain "${domain}" "${operation}" --vms "${vm_names}" "$@" 
+
+    #iterate over our group of vms:
+    for i in ${vm_names} ; do 
+	${soe_vm_control_script} --domain "${domain}" "${operation}" --vm "${i}" "$@" 
+    done
 }
 
 #docker commands:
@@ -103,59 +107,6 @@ function docker-container-ls () {
 
 ################################################
 #Adapt these from libvirt to docker as required:
-#test status of vms:
-function vm-test-boot () {
-    vms_up=0
-    for i in  ${vm_names} ; do 
-	#virsh qemu-agent-command "${domain}_${i}" '{"execute":"guest-ping"}' 2>/dev/null | grep -q "return"    ##good ping gives: {"return":{}}
-	if [[ $? -eq 0 ]] ; then    #grep returns 0 on match
-	    echo "${i} is Up."
-	    vms_up+=1
-	else
-	    echo "${i} is not Up."
-	fi
-    done
-    return $vms_up
-}
-function vm-test-up () {
-    vms_up=0
-    for i in  ${vm_names} ; do 
-	#virsh list --state-running --name | grep -q "$i"
-	if [[ $? -eq 0 ]] ; then   #grep returns 0 on match
-	    echo "${i} is running."
-	    vms_up+=1
-	else
-	    echo "${i} is not running."
-	fi
-    done
-    return $vms_up
-}
-
-##libvirt or docker:
-function vm-wait-boot () {
-    echo "Waiting:    VMs: ${vm_names}"
-    set -- ${vm_names}
-    no_of_vms=$#
-    vm-test-boot
-    up=$?
-    while [[ ${up} -lt ${no_of_vms} ]]  ; do 
-	sleep 1
-	vm-test-boot
-	up=$?
-    done
-    echo "Waiting ${SSHD_DELAY} seconds extra for sshd to come up."
-    sleep ${SSHD_DELAY} #qemu guest agent comes up fast, so, wait 5 secs for ssh
-}
-function vm-wait-shutdown () {
-    echo "Waiting:    VMs: ${vm_names}"
-    vm-test-up
-    up=$?
-    while [[ ${up} -gt 0 ]]  ; do 
-	sleep 1
-	vm-test-up
-	up=$?
-    done
-}
 
 #misc:
 function msg_start () {
@@ -178,45 +129,32 @@ function set-x-on () {
 function set-x-off () {
     set +x
 }
-function test-tags () {
-    vm-ansible-run-soe --tags "f27-server,f27-runlevel" -vv
-}
 function test-vm-control () {
     soe-vm-control "status" --vms "${vm_names}"
 }
 
 #That's all we really need. Now we can define some groups of commands and then some sequences which use these groups:
-function vm-boot () {
-    soe-vm-control-vms "build"         #build and tag with "01"
-    #soe-vm-control-vms "rebuild"       #rebuild (with --no-cache) and tag with "01"
-}
-
-function vm-undefine () {
-    #quick hack:
-    docker rmi --force soe.vorpal_fedora:working
-    docker rmi --force soe.vorpal_fedora:current
-}
 
 #sequences:
 function sequence-full () {
     echo "Running full sequence to: define, start, connect, install soe, shutdown, undefine:"
-    vm-boot
-    #vm-wait-boot
-    
+
+    #build image: 01:
+    soe-vm-control-vms "build"         #build and tag with "01"
+    #soe-vm-control-vms "rebuild"       #rebuild (with --no-cache) and tag with "01"
+
     soe-vm-control-vms "reimage"       #Set "working" image to "01" base os image
     #soe-vm-control-vms "refresh"       #Set "working" image to "current" soe'd image.
     soe-vm-control-vms "current"       #Update "current" soe'd image from "working" image.
     
     #soe-vm-control-vms "run"           #Use "working" image to run initial post-boot preparation script at /soe/scripts/vmname-run.sh
     soe-vm-control-vms "soe"            #Run soe installation script at /soe/scripts/vmname-run-soe.sh in image: working, create: current
-
-    #soe-vm-control-vms "loop"          #Run active command under process monitor, eg: sshd
-    #vm-ansible-setup 
-    #vm-ansible-run-soe
 }
 function sequence-partial () {
     echo "Running ad-hoc sequence of commands:"   #comment or uncomment as desired:
     #soe-vm-control-vms "status"
+
+    #soe-vm-control-vms "undefine"      #Wipes 01, working and current images.
 
     #build image: 01:
     #soe-vm-control-vms "build"         #build and tag with "01"
@@ -224,16 +162,21 @@ function sequence-partial () {
 
     #Setup working image:
     soe-vm-control-vms "reimage"        #Set "working" image to "01" base os image
+    ###soe-vm-control-vms "refresh"       #Set "working" image to "current" soe'd image.
     soe-vm-control-vms "current"        #Update "current" soe'd image from "working" image.
 
-    #Test latest updates:
+    #Test updates to run-soe script:
     soe-vm-control-vms "soe-update"     #Update run-soe script in image: working"
     soe-vm-control-vms "soe"            #Run soe installation script at /soe/scripts/vmname-run-soe.sh in image: working, create: current
-
-    #vm-undefine                        #Wipes working and current images.       #HACK - just on fedora image.
 }
 function sequence-test () {
     echo "Running test sequence of commands:"   #comment or uncomment as desired:
+    #soe-vm-control-vms "status"
+}
+function sequence-vm () {
+    #vm_names="fedora"
+    echo "Running test sequence of commands on vms: ${vm_names}"   #comment or uncomment as desired:
+    #soe-vm-control "status" --vms "${vm_names}"
 }
 #set-x-on
 ########################################Start invoking commands here:
@@ -242,9 +185,12 @@ soe-set-vm_names
 process_args $@    #Do not quote the $@. Mainly just process --vm-names "foo bar"
 msg_start
 
-#sequence-full
-sequence-partial
+#soe-vm-control-vms "undefine"      #Wipes working and current images.
+
+sequence-full
+#sequence-partial
 #sequence-test 
+###sequence-vm
 
 #soe-vm-control-vms "create"         #Create container from image: working."
 
