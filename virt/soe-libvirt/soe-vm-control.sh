@@ -36,7 +36,7 @@ usage () {
     echo
     echo "      -h | --help                     Lists this usage information."
     echo "      -d | --debug                    Echo the commands that will be executed."
-    echo "      --vms  \"vm1 vm2\"                Space separated quoted list of vm names"
+    echo "      --vm  \"vm1\"                     Space separated quoted list of vm names"
     echo "      --domain  \"soe.vorpal\"          Domain name."
     echo
     echo "Available VMs:"
@@ -88,7 +88,7 @@ function process_args () {
             -d | --debug )    export debug=1; export DEBUG=echo ; echo -e "\nDebug mode on.";;
             status | create | define | undefine | reimage | refresh | start | destroy | save | restore | shutdown | reboot | reset )
                 operation="${1}" ; echo -e "Executing operation: $1.";;
-	    --vms)            ok=1 ; vmnames="$2"  ; echo "Operating on vms: ${vmnames}" ; shift ;;
+	    --vm)            ok=1 ; vmname="$2"  ; echo "Operating on vms: ${vmname}" ; shift ;;
 	    --domain)         domain="$2"  ; echo "Operating on domain: ${domain}" ; shift ;;
             *)                ok=0 ; echo "Unrecognised option." ;  usage ;;
 	esac;
@@ -99,37 +99,15 @@ function process_args () {
     echo
 }
 
-function check_operation_retry () {
-    op="$1"
-    if [[ "start" == *"${op}"* ]] ; then 
-	echo "Valid retry operation: ${op}"
-	return 1;
-    else
-	return 0
-    fi
+###################vm functions
+function vm_op () {
+    operation="$1"
+    echo "${vmname}:"
+    $DEBUG virsh ${operation} "${domain}_${vmname}"
 }
-function check_operation () {
-    op="$1"
-    if [[ "destroy save restore shutdown reboot reset" == *"${op}"* || "${op}" == "undefine" ]] ; then 
-	echo "Valid normal operation: ${op}"
-	return 1;
-    else
-	return 0
-    fi
-}
-
-function check_xml_operation () {
-    op="$1"
-    if [[ "create define" == *"${op}"* ]] ; then 
-	echo "Valid xml_file operation: ${op}"
-	return 1;
-    else
-	return 0
-    fi
-}
-function retry () {
-    vmname="$1"
-    operation="$2"
+function vm_op_retry () {
+    operation="$1"
+    echo "retry-${operation} ${vmname}:"
     RETRIES=3
     for j in 1 to ${RETRIES} ; do 
 	$DEBUG virsh ${operation} "${domain}_${vmname}"
@@ -142,44 +120,16 @@ function retry () {
 	fi
     done
 }
-function vm_op_all () {
+function vm_xml_op () {
     operation="$1"
-    for i in ${vmnames} ; do 
-	echo "${i}:"
-	$DEBUG virsh ${operation} "${domain}_${i}"
-    done
-}
-function vm_op_all_retry () {
-    operation="$1"
-    for i in ${vmnames} ; do 
-	echo "${i}:"
-	retry "${i}" "${operation}"
-    done
-}
-function vm_xml_op_all () {
-    operation="$1"
-    for i in ${vmnames} ; do 
-	echo "${i}:"
-	$DEBUG virsh ${operation} "${TEMPLATE_DIR}/${domain}_${i}.xml"
-    done
+    echo "${operation} ${vmname}:"
+    $DEBUG virsh ${operation} "${TEMPLATE_DIR}/${domain}_${vmname}.xml"
 }
 function vm_reimage () {
-    $DEBUG cp --sparse=always -v "${BLANK_IMAGE}" "${VM_DIR}/${domain}/${1}.qcow2"
-}
-function vm_reimage_all () {
-    for i in ${vmnames} ; do 
-	vm_reimage "${i}"
-    done
+    $DEBUG cp --sparse=always -v "${BLANK_IMAGE}" "${VM_DIR}/${domain}/${vmname}.qcow2"
 }
 function vm_refresh () {
-    mydomain="$1"
-    myvmname="$2"
-    $DEBUG cp --sparse=always -v "${IMAGE_DIR}/${mydomain}/${myvmname}-vm01.qcow2" "${VM_DIR}/${mydomain}/${myvmname}.qcow2"
-}
-function vm_refresh_all () {
-    for i in ${vmnames} ; do 
-	vm_refresh "${domain}" "${i}"
-    done
+    $DEBUG cp --sparse=always -v "${IMAGE_DIR}/${domain}/${vmname}-vm01.qcow2" "${VM_DIR}/${domain}/${vmname}.qcow2"
 }
 
 function set-x-on () {
@@ -192,21 +142,14 @@ function set-x-on () {
 echo
 process_args "$@"
 
-#vm_all
-if [[ $( check_operation "${operation}" ) ]] ; then 
-    vm_op_all "${operation}"
-elif [[ $( check_operation_retry "${operation}" ) ]] ; then 
-    vm_op_all_retry "${operation}"
-elif [[ $( check_xml_operation "${operation}" ) ]] ; then 
-    vm_xml_op_all "${operation}"
-elif [[ "${operation}" == "status" ]] ; then 
-    vm_op_all "domstate --reason"
-elif [[ "${operation}" == "reimage" ]] ; then 
-    vm_reimage_all 
-elif [[ "${operation}" == "refresh" ]] ; then 
-    vm_refresh_all 
-else 
-    echo "Hmm. Unknown operation: ${operation}"
-fi
+case ${operation} in          #switches for this shell script begin with '--'
+    start)            vm_op_retry "${operation}" ;;
+    create | define)  vm_xml_op "${operation}" ;;
+    reimage)          vm_reimage ;;
+    refresh)          vm_refresh ;;
+    status)           vm_op "domstate --reason" ;;
+    *)                vm_op "${operation}" ;;
+    #*)                ok=0 ; echo "Unrecognised option." ;  usage ;;
+esac;
 
 echo

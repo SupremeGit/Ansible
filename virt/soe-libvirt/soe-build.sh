@@ -52,10 +52,10 @@ function usage () {
 
 function process_args () {
     #call like: process_args "$@"
-    if [[ "$#" == "0" ]]; then
-	echo "No arguments. Halp!"
-	usage
-    fi
+    #if [[ "$#" == "0" ]]; then
+	#echo "No arguments. Halp!"
+	#usage
+    #fi
     local ok=1
     while (( "$#" )); do
 	case ${1} in          #switches for this shell script begin with '--'
@@ -81,7 +81,9 @@ function soe-vm-control-vms () {
     operation=$1 ; shift ;
     #echo "VMs: ${vm_fq_names}"
     #echo "${operation}:   $@"
-    ${soe_vm_control_script} --domain "${domain}" "${operation}" --vms "${vm_names}" "$@" 
+    for i in ${vm_names} ; do 
+	${soe_vm_control_script} --domain "${domain}" "${operation}" --vm "${i}" "$@" 
+    done
 }
 
 #basic command without playbook, facts on/off:

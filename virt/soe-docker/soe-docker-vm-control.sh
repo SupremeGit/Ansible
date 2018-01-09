@@ -193,7 +193,9 @@ function vm_loop () {
     operation="run --rm"
     echo "Loop ${vmname}:"
     operation+=" --hostname ${vmname}"
-    $DEBUG docker ${operation} "${domain}_${vmname}:loop"    "/soe/scripts/${vmname}-run-sshd.sh"  #run sshd under process manager: monit or supervisord
+
+    #invoke script which should run process manager: monit or supervisord, and use it to manage ongoing processes like sshd
+    $DEBUG docker ${operation} "${domain}_${vmname}:loop"    "/soe/scripts/${vmname}-run-sshd.sh"  #run sshd under monit
 }
 function vm_set_current () {
     #tag our working image as our "current" soe'd image:
