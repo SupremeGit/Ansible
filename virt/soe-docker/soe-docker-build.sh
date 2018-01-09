@@ -27,10 +27,8 @@ scriptname="soe-docker-build.sh"
 #  available operations: create, define, undefine, define, reimage, refresh, start, destroy, save. restore, shutdown, reboot, reset
 TOOL_DIR="/data-ssd/data/development/src/github/ansible-soe/virt"
 soe_vm_control_script="${TOOL_DIR}/soe-docker/soe-docker-vm-control.sh"
-source "${TOOL_DIR}/soe-ansible/soe-ansible.sh"     #source functions to run our ansible soe playbooks
-
 domain="soe.vorpal"       #vm "domain" to use when creating vms
-hostgroup="${domain%.*}"  #use leftmost part of domain for ansible hostgroup
+source "${TOOL_DIR}/soe-ansible/soe-ansible.sh"     #source functions to run our ansible soe playbooks
 SSHD_DELAY=15             #extra delay to wait for ssh.
 
 #vms to operate on:

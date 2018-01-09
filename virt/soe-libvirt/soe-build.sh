@@ -12,17 +12,11 @@ scriptname="soe-build.sh"
 
 #soe-vm-control.sh operates on a group of vms defined from a libvirt template:
 #  available operations: create, define, undefine, define, reimage, refresh, start, destroy, save. restore, shutdown, reboot, reset
-TOOL_DIR="/data-ssd/data/development/src/github/ansible-soe/virt/soe-libvirt"
-soe_vm_control_script="${TOOL_DIR}/soe-vm-control.sh"
+TOOL_DIR="/data-ssd/data/development/src/github/ansible-soe/virt"
+soe_vm_control_script="${TOOL_DIR}/soe-libvirt/soe-vm-control.sh"
 scriptname="soe-build.sh"
-
-#ansible hosts/vault/playbook config:
-var_playbook_connect="/etc/ansible/playbooks/connect-host.yml"       #${var_playbook_connect}
-var_playbook_soe="/etc/ansible/playbooks/soe.yml"    	             #${var_playbook_soe}
-vault="--vault-password-file ~/.ansible_vault_password"              #${vault}
-hostsfile="-i /etc/ansible/hosts"                                    #${hostsfile} 
 domain="soe.vorpal"     #vm "domain" to use when creating vms
-hostgroup=${domain%.*}  #use leftmost part of domain for ansible hostgroup
+source "${TOOL_DIR}/soe-ansible/soe-ansible.sh"     #source functions to run our ansible soe playbooks
 SSHD_DELAY=15           #extra delay to wait for ssh.
 
 #vms to operate on:
@@ -85,15 +79,6 @@ function soe-vm-control-vms () {
 	${soe_vm_control_script} --domain "${domain}" "${operation}" --vm "${i}" "$@" 
     done
 }
-
-#basic command without playbook, facts on/off:
-function ansible-play           () { ansible-playbook ${vault} ${hostsfile} --extra-vars "hostgroups=${hostgroup}"             "$@" ; }
-function ansible-play-facts-off () { ansible-playbook ${vault} ${hostsfile} --extra-vars "hostgroups=${hostgroup} facts_on=no" "$@" ; }
-
-#main playbook commmands:
-function ansible-connect        () { ansible-play-facts-off ${var_playbook_connect} --tags=connect-new-host                "$@" ; }
-function ansible-requirements   () { ansible-play-facts-off ${var_playbook_connect} --tags=ansible_requirements            "$@" ; }
-function ansible-soe            () { ansible-play           ${var_playbook_soe}     --extra-vars "hostgroups=${hostgroup}" "$@" ; }
 
 #test status of vms:
 function vm-test-boot () {
@@ -191,13 +176,6 @@ function vm-shutdown () {
 function vm-undefine () {
     soe-vm-control-vms "destroy"
     soe-vm-control-vms "undefine"
-}
-function vm-ansible-setup () {
-    echo "Connecting vis ssh key: ${vm_fq_names}"             ; ansible-connect      --limit "${vm_fq_names}"
-    echo "Installing Ansible requirements: ${vm_fq_names}"    ; ansible-requirements --limit "${vm_fq_names}"
-}
-function vm-ansible-run-soe () {
-    echo "Running SOE deploymemt tasks: ${vm_fq_names}"       ; ansible-soe          --limit "${vm_fq_names}" "$@"
 }
 
 #sequences:

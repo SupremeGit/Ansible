@@ -1,7 +1,9 @@
 #!/bin/bash
 scriptname="soe-ansible.sh"
 
-#ansible hosts/vault/playbook config:
+#source after domain is set:
+hostgroup=${domain%.*}  #use leftmost part of domain for ansible hostgroup
+
 var_playbook_connect="/etc/ansible/playbooks/connect-host.yml"       #${var_playbook_connect}
 var_playbook_soe="/etc/ansible/playbooks/soe.yml"    	             #${var_playbook_soe}
 vault="--vault-password-file ~/.ansible_vault_password"              #${vault}
