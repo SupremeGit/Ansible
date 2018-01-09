@@ -35,9 +35,9 @@ SSHD_DELAY=15             #extra delay to wait for ssh.
 
 #vms to operate on:
 #def_vm_names="centos7 fedora ubuntu ubuntu_server temp foo bar"
-#def_vm_names="centos7 fedora ubuntu_server temp"
-#def_vm_names="centos7 temp"
-def_vm_names="centos7"
+#def_vm_names="fedora ubuntu_server temp"
+#def_vm_names="fedora temp"
+def_vm_names="fedora"
 vm_names=""
 
 function soe-set-vm_names () {
@@ -60,10 +60,10 @@ function usage () {
 
 function process_args () {
     #call like: process_args "$@"
-    if [[ "$#" == "0" ]]; then
-	echo "No arguments. Halp!"
-	usage
-    fi
+    #if [[ "$#" == "0" ]]; then
+	#echo "No arguments. Halp!"
+	#usage
+    #fi
     local ok=1
     while (( "$#" )); do
 	case ${1} in          #switches for this shell script begin with '--'
@@ -176,8 +176,8 @@ function sequence-test () {
 #set-x-on
 ########################################Start invoking commands here:
 #when not set here, vm_names and vm_fq_names are taken from environment, or from $@:
-soe-set-vm_names  
-process_args $@    #Do not quote the $@. Mainly just process --vm-names "foo bar"
+soe-set-vm_names   #set default vm_names
+process_args $@    #Do not quote the $@. Mainly just process --vms "foo bar"
 msg_start
 
 #soe-vm-control-vms "undefine"      #Wipes working and current images.
