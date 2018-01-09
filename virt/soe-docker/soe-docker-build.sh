@@ -25,10 +25,9 @@ scriptname="soe-docker-build.sh"
 
 #soe-vm-control.sh operates on a group of vms defined from a libvirt template:
 #  available operations: create, define, undefine, define, reimage, refresh, start, destroy, save. restore, shutdown, reboot, reset
-TOOL_DIR="/data-ssd/data/development/src/github/ansible-soe/virt/soe-docker"
-soe_vm_control_script="${TOOL_DIR}/soe-docker-vm-control.sh"
-
-source "${TOOL_DIR}/soe-ansible.sh"
+TOOL_DIR="/data-ssd/data/development/src/github/ansible-soe/virt"
+soe_vm_control_script="${TOOL_DIR}/soe-docker/soe-docker-vm-control.sh"
+source "${TOOL_DIR}/soe-ansible/soe-ansible.sh"     #source functions to run our ansible soe playbooks
 
 domain="soe.vorpal"       #vm "domain" to use when creating vms
 hostgroup="${domain%.*}"  #use leftmost part of domain for ansible hostgroup
@@ -187,54 +186,54 @@ function test-vm-control () {
 }
 
 #That's all we really need. Now we can define some groups of commands and then some sequences which use these groups:
-
 function vm-boot () {
-    soe-vm-control-vms "build"
-    soe-vm-control-vms "run"
+    soe-vm-control-vms "build"         #build and tag with "01"
+    #soe-vm-control-vms "rebuild"       #rebuild (with --no-cache) and tag with "01"
 }
+
 function vm-undefine () {
-    docker rmi --force soe.vorpal_fedora:latest
-}
-function vm-shutdown () {
-    #soe-vm-control-vms "shutdown"
-    #vm-wait-shutdown
-    vm-undefine
+    #quick hack:
+    docker rmi --force soe.vorpal_fedora:working
+    docker rmi --force soe.vorpal_fedora:current
 }
 
 #sequences:
 function sequence-full () {
     echo "Running full sequence to: define, start, connect, install soe, shutdown, undefine:"
     vm-boot
-    vm-wait-boot
-    vm-ansible-setup 
-    vm-ansible-run-soe
-    vm-shutdown
+    #vm-wait-boot
+    
+    soe-vm-control-vms "reimage"       #Set "working" image to "01" base os image
+    #soe-vm-control-vms "refresh"       #Set "working" image to "current" soe'd image.
+    soe-vm-control-vms "current"       #Update "current" soe'd image from "working" image.
+    
+    #soe-vm-control-vms "run"           #Use "working" image to run initial post-boot preparation script at /soe/scripts/vmname-run.sh
+    soe-vm-control-vms "soe"            #Run soe installation script at /soe/scripts/vmname-run-soe.sh in image: working, create: current
+
+    #soe-vm-control-vms "loop"          #Run active command under process monitor, eg: sshd
+    #vm-ansible-setup 
+    #vm-ansible-run-soe
 }
 function sequence-partial () {
     echo "Running ad-hoc sequence of commands:"   #comment or uncomment as desired:
     #soe-vm-control-vms "status"
 
-    #soe-vm-control-vms "build"         #docker tag soe.vorpal_fedora soe.vorpal_fedora:01
-    soe-vm-control-vms "run"           #run initial post-boot preparation script at /soe/scripts/vmname-run.sh
+    #build image: 01:
+    #soe-vm-control-vms "build"         #build and tag with "01"
+    #soe-vm-control-vms "rebuild"       #rebuild (with --no-cache) and tag with "01"
 
-    #tag if desired:
-    #docker tag soe.vorpal_fedora soe.vorpal_fedora:01
+    #Setup working image:
+    soe-vm-control-vms "reimage"        #Set "working" image to "01" base os image
+    soe-vm-control-vms "current"        #Update "current" soe'd image from "working" image.
 
-    #vm-boot
-    #vm-wait-boot
+    #Test latest updates:
+    soe-vm-control-vms "soe-update"     #Update run-soe script in image: working"
+    soe-vm-control-vms "soe"            #Run soe installation script at /soe/scripts/vmname-run-soe.sh in image: working, create: current
 
-    #vm-ansible-setup 
-    #vm-ansible-run-soe
-
-    #vm-shutdown
-    #vm-wait-shutdown
-
-    #vm-undefine
+    #vm-undefine                        #Wipes working and current images.       #HACK - just on fedora image.
 }
 function sequence-test () {
     echo "Running test sequence of commands:"   #comment or uncomment as desired:
-    #soe-vm-control-vms "reimage"   #replace with (small, sparse) blank disk image
-    #soe-vm-control-vms "refresh"   #replace with image of freshly installed os
 }
 #set-x-on
 ########################################Start invoking commands here:
@@ -243,10 +242,11 @@ soe-set-vm_names
 process_args $@    #Do not quote the $@. Mainly just process --vm-names "foo bar"
 msg_start
 
-
 #sequence-full
 sequence-partial
 #sequence-test 
+
+#soe-vm-control-vms "create"         #Create container from image: working."
 
 #status:
 echo "Docker images:"; docker images
@@ -254,3 +254,14 @@ docker-container-ls
 
 msg_finished
 ########################################Finish here.
+
+#  docker commit --change "ENV DEBUG true"" $CID soe.vorpal_fedora:current
+#
+#The --change option will apply Dockerfile instructions to the image that is created, eg to change CMD or ENTRYPOINT:
+#  Supported Dockerfile instructions: CMD|ENTRYPOINT|ENV|EXPOSE|LABEL|ONBUILD|USER|VOLUME|WORKDIR
+#eg:
+#  docker commit --change "ENV DEBUG true" c3f279d17e0a  svendowideit/testimage:version3
+#  f5283438590d
+#  docker inspect -f "{{ .Config.Env }}" f5283438590d
+#  [HOME=/ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBUG=true]
+

@@ -310,13 +310,15 @@ alias jj-docker-container-list-dead="docker ps -aq -f status=dead"
 alias jj-docker-container-list-created="docker ps -aq -f status=created"
 alias jj-docker-container-list-running="docker ps -aq -f status=running"
 
-
 function jj-docker-run-interactive () {
     snapshot="${1}"
-    #docker commit 12345678904b5 mysnapshot
     ## explore this filesystem using bash (for example)
     docker run --tty --interactive "${snapshot}" /bin/bash
-    #docker rmi mysnapshot
+}
+function jj-docker-run-interactive-rm () {
+    snapshot="${1}"
+    ## explore this filesystem using bash (for example)
+    docker run --rm --tty --interactive "${snapshot}" /bin/bash
 }
 
 #tag images:
