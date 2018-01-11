@@ -1,0 +1,15 @@
+
+#Normally when you start monit it will start as a daemon. But fortunately, you can prevent this with the following configuration.
+set init
+
+set httpd
+     port 2812
+     #allow myuser:mypassword
+
+check process mysqld with pidfile /var/run/mysqld/mysqld.pid
+        start program = "/sbin/service mysqld start"
+        stop program = "/sbin/service mysqld stop"
+
+#check process mysqld with pidfile /var/run/mysqld/mysqld.pid
+#        start program = "/sbin/service mysqld start"
+#        stop program = "/sbin/service mysqld stop"

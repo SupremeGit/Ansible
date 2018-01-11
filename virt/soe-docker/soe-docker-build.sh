@@ -1,27 +1,37 @@
 #!/bin/bash
 scriptname="soe-docker-build.sh"
-# soe-docker-build.sh - script to sequence some ops using:
-#    soe-docker-vm-control.sh to: maniupulate libvirt vms
-#    several ansible playbooks to connect & install soe on hosts 
+# soe-docker-build.sh - script to sequence some Docker ops using:
+#    soe-docker-vm-control.sh to: maniupulate docker vms
+#    todo: several ansible playbooks to connect & install soe on hosts 
+#
+# By default: build the docker image defined by Dockerfile and update 01, working, tags.
+# Also run the ${hostname}-run-soe.sh script on each container.
 #
 # Can call this script like:
-#    ./soe-docker-build.sh --vms "centos7 fedora"
-# The soe-docker-vm-control script is alao called like:
-#    soe-docker-vm-control.sh status   --vms "centos7 fedora temp foo bar ubuntu ubuntu_server"
-# If present, --vms "foo bar" must be the last parameter
-
-#Docker config:
-#config file: ~/.docker/config.json
-#images stored in: /var/lib/docker
-##cd /data-ssd/data/development/os/docker/
+#   soe-docker-build.sh --vms "centos7 fedora"
+#
+#   soe-docker-vm-control script is alao called like:
+#     soe-docker-vm-control.sh status  --vms "centos7 fedora temp foo bar ubuntu ubuntu_server"
+#     If present, --vms "foo bar" must be the last parameter
 
 #Typical usage:
 #  docker pull fedora
 #  https://hub.docker.com/_/fedora/
 #    follow links to GitHub to get Dockerfile & fedora-27-x86_64-20171110.tar.xz
-#  tweak dockerfile, currently have to install openssh-server
-#  build image
-#  run container
+#  tweak dockerfile
+#  Use this script to build the base image (01) and update working & current tags.
+#  Run shell in container:
+#    Define:
+#      function docker-run-interactive () { snapshot="${1}" ; shift ; docker run --tty --interactive --name "fedora" --hostname "fedora" "${snapshot}" /bin/bash $@ ; }
+#      alias docker-container-restart="docker start -ai"
+#    Then you can:
+#    docker-run-interactive soe.vorpal_fedora:current
+#    docker-container-restart fedora
+
+#Docker system config is at:
+#  config file: ~/.docker/config.json
+#  images stored in: /var/lib/docker
+#  cd /data-ssd/data/development/os/docker/
 
 #soe-vm-control.sh operates on a group of vms defined from a libvirt template:
 #  available operations: create, define, undefine, define, reimage, refresh, start, destroy, save. restore, shutdown, reboot, reset

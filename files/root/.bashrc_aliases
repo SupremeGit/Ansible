@@ -168,7 +168,7 @@ alias jj-jc-jss="journalctl  --user-unit=jss"      #gives nothing, even when log
 #yum/dnf/apt:
 
 alias jj-yum-list-update=="dnf list > ~/zz_yum/yum.txt"
-alias jj-yum-list="cat ~/zz_yum/yum..txt"
+alias jj-yum-list="cat ~/zz_yum/yum.txt"
 alias jj-yum-grep="cat ~/zz_yum/yum.txt | grep"
 
 alias jj-yum-list-all-update=="dnf list > ~/zz_yum/yum.all.txt"
@@ -309,20 +309,42 @@ alias jj-docker-container-list-exited="docker ps -aq -f status=exited"   #view w
 alias jj-docker-container-list-dead="docker ps -aq -f status=dead"
 alias jj-docker-container-list-created="docker ps -aq -f status=created"
 alias jj-docker-container-list-running="docker ps -aq -f status=running"
+alias jj-docker-container-clean="for i in `docker ps --all -q` ; do docker rm $i ; done"    #remove all leftover containers:
+alias jj-docker-container-restart="docker start -ai"
 
 function jj-docker-run-interactive () {
-    snapshot="${1}"
-    ## explore this filesystem using bash (for example)
-    docker run --tty --interactive "${snapshot}" /bin/bash
+    snapshot="${1}" ; shift
+    #with dockerfile setting entrypoint bash, can get an interactive container with "-il":
+
+    #docker run --tty --interactive --name "fedora" "${snapshot}" /bin/bash
+    #docker run --tty --interactive --name "fedora" --hostname "fedora" "${snapshot}" /bin/bash $@
+    #docker run --tty --interactive --name "fedora" --hostname "fedora" --entrypoint="/bin/bash" "${snapshot}"  $@
+
+    #good, for entrypoint bash: 
+    #docker run --tty --interactive --name "fedora" --hostname "fedora" "${snapshot}" "-il" $@
+
+    #dumb-init: append /bin/bash for terminal:
+    docker run --tty --interactive --name "fedora" --hostname "fedora" "${snapshot}" /bin/bash $@
 }
 function jj-docker-run-interactive-rm () {
-    snapshot="${1}"
-    ## explore this filesystem using bash (for example)
-    docker run --rm --tty --interactive "${snapshot}" /bin/bash
+    snapshot="${1}" ; shift
+    #with dockerfile setting entrypoint bash, can get an interactive container with "-il":
+
+    #docker run --rm --tty --interactive --name "fedora" "${snapshot}" /bin/bash
+
+    #doen't need "-il"...
+    #docker run --rm --tty --interactive --name "fedora" --hostname "fedora" --entrypoint="/bin/bash" "${snapshot}" $@
+
+    #do need "-il", or it just runs fedora-run.sh as specified by entrypoint/cmd and exits
+    #docker run --rm --tty --interactive --name "fedora" --hostname "fedora" "${snapshot}" "-il" $@
+
+    #dumb-init:
+    docker run --rm --tty --interactive --name "fedora" --hostname "fedora" "${snapshot}" /bin/bash $@
 }
 
 #tag images:
 #docker tag soe.vorpal_fedora soe.vorpal_fedora:01
+
 
 
 #docker machine:

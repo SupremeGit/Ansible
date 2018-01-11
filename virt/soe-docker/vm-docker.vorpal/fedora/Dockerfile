@@ -30,11 +30,15 @@ RUN dnf install --assumeyes net-tools
 RUN dnf install --assumeyes hostname
 RUN dnf install --assumeyes openssh-server
 RUN dnf install --assumeyes monit
+RUN dnf install --assumeyes dumb-init
+RUN dnf install --assumeyes procps-ng
+RUN dnf install --assumeyes less
+
 #RUN dnf install --assumeyes tigervnc-server
 
 
-# Make port 22 available to the world outside this container
-EXPOSE 22
+# Make port 22 available to the world outside this container, and 2812 for monit status webpage:
+EXPOSE 22 2812
 
 ##################################
 #Specify main entrypoint, or cmd:
@@ -78,7 +82,32 @@ EXPOSE 22
 
 #########################################################
 
+#Run dumb-init:
+# Runs "/usr/bin/dumb-init -- /my/script --with --args"
+#ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+#--single-child  only forward signals to direct child, not to all managed processes (& subprocesses):
+#  this is useful when starting a shell, as without this, bash job control does not work:
+ENTRYPOINT ["/usr/bin/dumb-init", "--single-child", "--"]
+#
+# or if you use --rewrite or other cli flags
+# ENTRYPOINT ["dumb-init", "--rewrite", "2:3", "--"]
+#
+
+#CMD ["/my/script", "--with", "--args"]
+#CMD ["/bin/bash", "-il"]
+CMD ["/bin/bash"]
+
 # Run fedora-run.sh when the container launches
-CMD ["bash", "/soe/scripts/fedora-run.sh"]
+#CMD ["bash", "/soe/scripts/fedora-run.sh"]
+
+###ENTRYPOINT ["/bin/bash","-il"]
+#ENTRYPOINT ["/bin/bash"]
+#CMD ["/soe/scripts/fedora-run.sh"]
+
+#Or use monit instead of dumb-init:
+#CMD=["monit", "-d", "10", "-Ic", "/soe/scripts/monitrc"]
+
+#with entrypoint bash, can get an interactive container with:
+#docker run --tty --interactive --hostname "balls" soe.vorpal_fedora:current "-il"
 
 #########################################################

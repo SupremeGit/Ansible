@@ -1,13 +1,64 @@
 
 #Fedora Rawhide is available via fedora:rawhide and any specific version of Fedora as fedora:$version (example: fedora:23).
 
+#Deps:
+#  502  2018-01-11 04:25:12 vagrant plugin install vagrant-vbguest
+#  503  2018-01-11 04:25:30 vagrant plugin install vagrant-hostmanager
+#  504  2018-01-11 04:26:03 vagrant plugin install vagrant-berkshelf
+#  505  2018-01-11 04:57:09 vagrant plugin install vagrant-net-ssh
+#  452  2018-01-11 04:50:30 rpm -ivh chefdk-2.4.17-1.el7.x86_64.rpm   #from: https://downloads.chef.io/chefdk#el
+#  454  2018-01-11 04:59:19 dnf install rubygem-net-ssh-gateway.noarch rubygem-net-ssh.noarch rubygem-net-ssh-multi.noarch
+
+#WARNING: Some services (web) use the 'deploy' key, which will be ignored. Compose does not support 'deploy' configuration 
+#- use `docker stack deploy` to deploy to a swarm.
+
+#docker swarm init
+#Error response from daemon: could not choose an IP address to advertise since this system has multiple addresses on different interfaces (192.168.1.100 on enp0s31f6 and 172.28.33.1 on vboxnet0) - specify one with --advertise-addr
+
+#docker swarm init --advertise-addr 192.168.1.100
+#Swarm initialized: current node (tlvjg0q3io32nwofkpi9sppn7) is now a manager.
+#
+#To add a worker to this swarm, run the following command:
+#    docker swarm join \
+#    --token SWMTKN-1-18x4iud8nkzf3qaninmhv3ywy7wsfbfw1qjogsuxfihm3uccfp-2ug3jxq8l7kcc47bz3758dc6b \
+#    192.168.1.100:2377
+#
+#To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+
+#Then:
+#docker stack deploy mystack --compose-file fedora-docker-compose.yml
+
+#docker stack services mystack
+#ID            NAME         MODE        REPLICAS  IMAGE
+#lug5sgbr4rka  mystack_web  replicated  0/2       docker.io/fedora:latest
+
+#docker stack ps mystack
+#ID            NAME               IMAGE                    NODE     DESIRED STATE  CURRENT STATE                    ERROR                             PORTS
+#r760rfls3bbw  mystack_web.1      docker.io/fedora:latest  Il-Duce  Ready          Rejected less than a second ago  "failed to allocate gateway (1…"
+
+#docker stack ls
+#NAME     SERVICES
+#mystack  1
+
+#docker stack rm mystack
+#Removing service mystack_web
+#Removing network mystack_webnet
+#Removing network mystack_default
+
+#docker swarm leave --force
+
+#can use environment vars as in shell eg: ${varname}
+
 version: "3"
 services:
   web:
     # replace username/repo:tag with your name and image details
     #image: username/repo:tag
     #image: docker.io/biggusdockus/quantum:part2
-    image:  docker.io/fedora:latest
+    #image:  docker.io/fedora:latest
+    #image:  fedora:latest
+    image: soe.vorpal_fedora:working
+    build: .  #docker stack accepts only pre-built images
     deploy:
       replicas: 2
       resources:
@@ -16,8 +67,12 @@ services:
           memory: 200M
       restart_policy:
         condition: on-failure
+    command: ["/bin/bash"]
+    #command: ["bash", "tail", " -f /etc/hosts"]
+    #command: ["tail", " -f /root/fedora-run.log.txt"]
+    #command: ["bash", "/soe/scripts/fedora-run-soe.sh"]
     ports:
-      - "80:80"
+      - "22:22"
     networks:
       - webnet
 networks:
