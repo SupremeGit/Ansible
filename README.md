@@ -6,10 +6,9 @@ Some ansible playbooks to setup a basic SOE on various linux distributions, curr
  * centos 7.4 
  * ubuntu 17.04 desktop/server.
 
+
 The virt folder contains several tools to test the ansible playbooks on supported distributions:
-
  * soe-libvirt: Templates & scripts using libvirt/virsh to test on VMs.
-
  * soe-docker:  
    * Dockerfile & scripts using Docker to build images & manage containers. 
    * Currently only creates an image to test fedora.
