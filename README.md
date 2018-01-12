@@ -27,7 +27,7 @@ The virt subfolder contains several tools to test the ansible playbooks on suppo
  * soe-docker:
    * Uses a similar scheme to soe-libvirt:
      * vm-docker.vorpal folder with configuration (Dockerfile, docker-compose.yml, monit config, scripts) to build Docker images of targeted distributions.
-     * soe-docker-control.sh and soe-docker-build.sh, use Docker CLI to to manage building the Docker images and sequencing operations on images & containers.
+     * soe-docker-control.sh and soe-docker-build.sh - use Docker CLI to to build Docker images and sequence operations on images & containers.
    * Currently only creates an image to test fedora. 
    * Other distros will be added shortly, once things are working nicely for Fedora.
    * I'll probably add Vagrant support shortly, for more control
