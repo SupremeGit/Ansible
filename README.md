@@ -7,7 +7,8 @@ Some ansible playbooks to setup a basic SOE on various linux distributions, curr
  * Ubuntu 17.04 desktop/server.
 
 
-The Ansible SOE currently performs the following tasks:
+The ansible playbooks currently perform the following tasks:
+ * setup ssh keys and dependencies (python2-dnf, python-apt) for full ansible operation.
  * setup epel, Puppet, and local base/update repositories
  * installs key apps: ssh server, git, collectd, nagios nrpe plugin executor, CockPit management console
  * configures firewall to allow monitoring & management via nagios, collectd, CockPit
@@ -24,9 +25,9 @@ The virt subfolder contains several tools to test the ansible playbooks on suppo
    * soe-build.sh - uses the soe-vm-control script to manage multiple VMs, in this case, the 9 VMs defined in the vm-soe.vorpal folder. Testing the SOE build involves re-imaging the VMs, starting them, wait for them to fully boot, and then running the ansible soe build playbooks on all images in parallel.
 
  * soe-docker:
-   * Uses a similar scheme to soe-libvirt, although I'll probably add Vagrant support shortly, for more control:
+   * Uses a similar scheme to soe-libvirt:
      * vm-docker.vorpal folder with configuration (Dockerfile, docker-compose.yml, monit config, scripts) to build Docker images of the different targeted distributions.
      * soe-docker-control.sh and soe-docker-build.sh, use Docker CLI to to manage building the Docker images and sequencing operations on images & containers.
    * Currently only creates an image to test fedora. 
    * Other distros will be added shortly, once things are working nicely for Fedora.
-
+   * I'll probably add Vagrant support shortly, for more control
