@@ -1,20 +1,22 @@
 # Ansible
 
 Some ansible playbooks to setup a basic SOE on various linux distributions, currently: 
- * fedora 26
- * fedora (27) 
- * centos 7.4 
- * ubuntu 17.04 desktop/server.
+ * Fedora 26
+ * Fedora (27) 
+ * CentOS 7.4 
+ * Ubuntu 17.04 desktop/server.
 
-The SOE currently consists of:
- * epel, puppet, and local base/update repositories
+
+The Ansible SOE currently performs the following tasks:
+ * setup epel, Puppet, and local base/update repositories
  * installs key apps: ssh server, git, collectd, nagios nrpe plugin executor, CockPit management console
  * configures firewall to allow monitoring & management via nagios, collectd, CockPit
  * starts services, including nagios, collectd, CockPit.
  * for Fedora, installs Xfce desktop group & sets default target to graphical
- * cronjob to periodically pulldown a git Puppet repository & run Puppet to deploy configuration updates committed to the git repository. This cronjob is not currently enabled, but I intend to enable it when testing some Puppet.
+ * installs cronjob to periodically pulldown a git Puppet repository & run Puppet to deploy configuration updates committed to the git repository. This cronjob is not currently enabled, but I intend to enable it when testing some Puppet.
 
-The virt folder contains several tools to test the ansible playbooks on supported distributions:
+
+The virt subfolder contains several tools to test the ansible playbooks on supported distributions:
  * soe-libvirt: Templates & scripts using libvirt/virsh to test on VMs.
    * vm-template folder: contains a master-template.xml file, which is a libvirt xml file for creating VMs. To create a new VM, copy the template, and in the copy, edit the VM name, description, and path to the disk image.
    * vm-soe.vorpal: contains a set of 9 libvirt VM xml files (created from the master template), describing 9 VMs I've setup with base OS installs (Fedora, CentOS, Ubuntu Desktop/Server)
