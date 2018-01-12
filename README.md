@@ -6,7 +6,6 @@ Some ansible playbooks to setup a basic SOE on various linux distributions, curr
  * CentOS 7.4 
  * Ubuntu 17.04 desktop/server.
 
-
 The ansible playbooks currently perform the following tasks:
  * setup ssh keys and dependencies (python2-dnf, python-apt) for full ansible operation.
  * setup epel, Puppet, and (for Fedora) local repositories
@@ -14,7 +13,7 @@ The ansible playbooks currently perform the following tasks:
  * configures firewall to allow monitoring & management via nagios, collectd, CockPit
  * starts services, including nagios, collectd, CockPit
  * installs bashrc, bashrc aliases, and .emacs configuration, for a less-painful sysadmin experience
- * for Fedora, installs Xfce desktop group & sets default target to graphical (other distros can follow when I've setup local repos for them to speed this up)
+ * for Fedora, install Xfce desktop group & set default systemd target to graphical (other distros will follow when I've setup local repos for them too, to speed this step up)
  * installs cronjob to periodically pulldown a git Puppet repository & run Puppet to deploy configuration updates committed to the git repository. This cronjob is not currently enabled, but I intend to enable it when testing some Puppet.
 
 
@@ -31,4 +30,4 @@ The virt subfolder contains several tools to test the ansible playbooks on suppo
      * soe-docker-control.sh and soe-docker-build.sh - use Docker CLI to to build Docker images and sequence operations on images & containers.
    * Currently only creates an image to test fedora. 
    * Other distros will be added shortly, once things are working nicely for Fedora.
-   * I'll probably add Vagrant support shortly, for more control
+   * I'll add Vagrant support shortly, for more control
