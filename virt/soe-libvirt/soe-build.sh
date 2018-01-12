@@ -137,13 +137,13 @@ function vm-wait-shutdown () {
 function msg_start () {
     echo
     echo "Started"
-    date +%H-%M-%S
+    date #+%H:%M:%S
     echo
 }
 function msg_finished () {
     echo
     echo "Finished:"
-    date +%H-%M-%S
+    date #+%H:%M:%S
     echo
 }
 

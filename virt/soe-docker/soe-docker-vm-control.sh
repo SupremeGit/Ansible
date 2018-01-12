@@ -20,11 +20,11 @@ usage () {
     echo
     echo "${scriptname}"
     echo 
-    echo "Usage > ${scriptname} --vms \"vm1 vm2 ...\" [operation]"
+    echo "Usage > ${scriptname} --vm \"vmname\" [operation]"
     echo
     echo "      -h | --help                     Lists this usage information."
     echo "      -d | --debug                    Echo the commands that will be executed."
-    echo "      --vm  \"vm1\"                     Space separated quoted list of vm names"
+    echo "      --vm  \"vmname\"                  VM to operate on."
     echo "      --domain  \"soe.vorpal\"          Domain name."
     echo
     echo "Available VMs:"

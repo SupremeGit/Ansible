@@ -32,11 +32,11 @@ usage () {
     echo
     echo "${scriptname}"
     echo 
-    echo "Usage > ${scriptname} --vms \"vm1 vm2 ...\" [operation]"
+    echo "Usage > ${scriptname} --vm \"vmname\" [operation]"
     echo
     echo "      -h | --help                     Lists this usage information."
     echo "      -d | --debug                    Echo the commands that will be executed."
-    echo "      --vm  \"vm1\"                     Space separated quoted list of vm names"
+    echo "      --vm  \"vmname\"                  VM to operate on."
     echo "      --domain  \"soe.vorpal\"          Domain name."
     echo
     echo "Available VMs:"
@@ -88,7 +88,7 @@ function process_args () {
             -d | --debug )    export debug=1; export DEBUG=echo ; echo -e "\nDebug mode on.";;
             status | create | define | undefine | reimage | refresh | start | destroy | save | restore | shutdown | reboot | reset )
                 operation="${1}" ; echo -e "Executing operation: $1.";;
-	    --vm)            ok=1 ; vmname="$2"  ; echo "Operating on vms: ${vmname}" ; shift ;;
+	    --vm)            ok=1 ; vmname="$2"  ; echo "Operating on vm: ${vmname}" ; shift ;;
 	    --domain)         domain="$2"  ; echo "Operating on domain: ${domain}" ; shift ;;
             *)                ok=0 ; echo "Unrecognised option." ;  usage ;;
 	esac;
