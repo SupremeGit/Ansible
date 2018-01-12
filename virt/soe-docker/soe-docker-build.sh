@@ -88,13 +88,13 @@ function process_args () {
 
 function soe-vm-control () {
     #usage> soe-vm-control "operation" --vms "${vm_names}"
-    operation=$1 ; shift ;
+    local operation=$1 ; shift ;
     #echo "${operation}:   $@"
     ${soe_vm_control_script} --domain "${domain}" "${operation}" "$@" 
 }
 function soe-vm-control-vms () {
     #usage> soe-vm-control-vms "operation"
-    operation=$1 ; shift ;
+    local operation=$1 ; shift ;
     #echo "VMs: ${vm_fq_names}"
     #echo "${operation}:   $@"
 
@@ -107,7 +107,7 @@ function soe-vm-control-vms () {
 #docker commands:
 function docker-container-ls () {
     echo ; echo "Docker containers:" ; docker ps --all
-    status="created restarting running paused exited dead"
+    local status="created restarting running paused exited dead"
     for i in ${status} ; do
 	echo ; echo "Docker containers: ${i}" ; docker ps -aq -f status="${i}"
     done

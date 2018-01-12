@@ -101,12 +101,12 @@ function process_args () {
 
 ###################vm functions
 function vm_op () {
-    operation="$1"
+    local operation="$1"
     echo "${vmname}:"
     $DEBUG virsh ${operation} "${domain}_${vmname}"
 }
 function vm_op_retry () {
-    operation="$1"
+    local operation="$1"
     echo "retry-${operation} ${vmname}:"
     RETRIES=3
     for j in 1 to ${RETRIES} ; do 
@@ -121,7 +121,7 @@ function vm_op_retry () {
     done
 }
 function vm_xml_op () {
-    operation="$1"
+    local operation="$1"
     echo "${operation} ${vmname}:"
     $DEBUG virsh ${operation} "${TEMPLATE_DIR}/${domain}_${vmname}.xml"
 }

@@ -86,7 +86,7 @@ function process_args () {
 #################
 
 function vm_op () {
-    operation="$1"
+    local operation="$1"
     echo "${i}:"
     $DEBUG docker ${operation} "${domain}_${i}"
 }
@@ -102,15 +102,15 @@ function vm_refresh () {
 }
 function vm_build_nocache () {
     #build image, view build images with "docker images"
-    operation="build"                    #build without tagging 
+    local operation="build"             #build without tagging 
     operation+=" --no-cache"            #use --no-cache to force fresh build:
     echo "${vmname}:"
-    tags=" -t ${domain}_${vmname}:01"       #Tag as our standard base image
+    local tags=" -t ${domain}_${vmname}:01"       #Tag as our standard base image
     $DEBUG docker ${operation} ${tags} "${TEMPLATE_DIR}/${vmname}/"
 }
 function vm_create () {
     #Create container from image: working
-    operation="create"
+    local operation="create"
     echo "${vmname}:"
     $DEBUG docker ${operation} "${domain}_${vmname}:working"
 }
@@ -118,34 +118,34 @@ function vm_build () {
     #build image, view build images with "docker images"
     #REPOSITORY                       TAG                 IMAGE ID            CREATED             SIZE
     #soe.vorpal_fedora                latest              4c22b1cddd1b        17 seconds ago      3.71 kB
-    operation="build"                    #build without tagging 
+    local operation="build"                  #build without tagging 
     echo "Build ${vmname}:"
     #tags=" -t ${domain}_${vmname}"          #build and save image with tag (-t "01" or --tags="01") default tag=latest
-    #tags=" --tags ${domain}_${vmname}:01"  #hmm, "-t" works but "--tags" gives unknown flag: --tags
-    tags=" -t ${domain}_${vmname}:01"       #Tag as our standard base image
+    #tags=" --tags ${domain}_${vmname}:01"   #hmm, "-t" works but "--tags" gives unknown flag: --tags
+    local tags=" -t ${domain}_${vmname}:01"       #Tag as our standard base image
     #tags=" -t ${domain}_${vmname}:current"  #Tag as our current, fully tweaked image
     $DEBUG docker ${operation} ${tags} "${TEMPLATE_DIR}/${vmname}/"
 }
 function vm_run () {
     #run default bootup cmd specified in Dockerfile "/soe/scripts/fedora-run.sh"
-    operation="run"                       #leave old ocntainers around so we can examine fs etc.
+    local operation="run"                 #leave old ocntainers around so we can examine fs etc.
     operation+=" --rm"                    #--rm removes old containers after they exit
     #operation+=" --detach"               #don't see output if we detach, but get container ID.
     echo "Run ${vmname}:"
-    operation+=" --hostname ${vmname}"      #setting hostname here does not persist in container, only has effect in this run: 
+    operation+=" --hostname ${vmname}"    #setting hostname here does not persist in container, only has effect in this run: 
     #$DEBUG docker ${operation} -i -t "${domain}_${vmname}:02"  "bash" #run interactively with tty
     #$DEBUG docker ${operation}       "${domain}_${vmname}:latest"     #don't use latest tag
     #run default cmd script:
     #$DEBUG docker ${operation}       "${domain}_${vmname}" 
     #run specific images:
     #$DEBUG docker ${operation}       "${domain}_${vmname}:current"    
-    $DEBUG docker ${operation}       "${domain}_${vmname}:working"     #build to work on
-    #$DEBUG docker ${operation}        "${domain}_${vmname}:01"        #01 is the image with base install/prep done.
+    $DEBUG docker ${operation}        "${domain}_${vmname}:working"    #build to work on
+    #$DEBUG docker ${operation}       "${domain}_${vmname}:01"         #01 is the image with base install/prep done.
 }
 function vm_run_soe () {
     #run ${vmname}-run-soe.sh
     echo "Run soe build script on: working, produces: current: ${i}:"
-    operation="run"                   #leave old ocntainers around so we can examine fs etc.
+    local operation="run"                  #leave old ocntainers around so we can examine fs etc.
     operation+=" --hostname ${vmname}"     #setting hostname here does not persist in container, only has effect in this run: 
     docker ${operation} "${domain}_${vmname}:working" "/soe/scripts/${vmname}-run-soe.sh"
     if [[ $? -eq 0 ]] ; then
@@ -168,7 +168,7 @@ function vm_run_soe () {
 }
 function vm_soe_update () {
     echo "Update soe build script in image: working: ${vmname}:"
-    operation="run"                    #leave old ocntainers around so we can examine fs etc.
+    local operation="run"                   #leave old ocntainers around so we can examine fs etc.
     operation+=" --hostname ${vmname}"      #setting hostname here does not persist in container, only has effect in this run: 
     $DEBUG docker ${operation} "${domain}_${vmname}:working"
     
@@ -190,7 +190,7 @@ function vm_soe_update () {
 }
 function vm_loop () {
     #run some kind of process manager and stay active, eg runnning sshd:
-    operation="run --rm"
+    local operation="run --rm"
     echo "Loop ${vmname}:"
     operation+=" --hostname ${vmname}"
 
