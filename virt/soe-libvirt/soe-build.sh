@@ -1,8 +1,9 @@
 #!/bin/bash
 scriptname="soe-build.sh"
-# soe-build.sh - script to sequence some ops using:
+# soe-build.sh - script to sequence some ops on a group of libvirt VMs using:
 #    soe-vm-control.sh to: maniupulate libvirt vms
 #    several ansible playbooks to connect & install soe on hosts 
+#    libvirt xml definition files for each VM to be managed.
 #
 # Can call this script like:
 #    ./soe-build.sh --vms "centos7 fedora"
@@ -66,13 +67,13 @@ function process_args () {
 
 function soe-vm-control () {
     #usage> soe-vm-control "operation" --vms "${vm_names}"
-    operation=$1 ; shift ;
+    local operation=$1 ; shift ;
     #echo "${operation}:   $@"
     ${soe_vm_control_script} --domain "${domain}" "${operation}" "$@" 
 }
 function soe-vm-control-vms () {
     #usage> soe-vm-control "operation"
-    operation=$1 ; shift ;
+    local operation=$1 ; shift ;
     #echo "VMs: ${vm_fq_names}"
     #echo "${operation}:   $@"
     for i in ${vm_names} ; do 
@@ -82,7 +83,7 @@ function soe-vm-control-vms () {
 
 #test status of vms:
 function vm-test-boot () {
-    vms_up=0
+    local vms_up=0
     for i in  ${vm_names} ; do 
 	virsh qemu-agent-command "${domain}_${i}" '{"execute":"guest-ping"}' 2>/dev/null | grep -q "return"    ##good ping gives: {"return":{}}
 	if [[ $? -eq 0 ]] ; then    #grep returns 0 on match
@@ -97,9 +98,9 @@ function vm-test-boot () {
 function vm-wait-boot () {
     echo "Waiting:    VMs: ${vm_names}"
     set -- ${vm_names}
-    no_of_vms=$#
+    local no_of_vms=$#
     vm-test-boot
-    up=$?
+    local up=$?
     while [[ ${up} -lt ${no_of_vms} ]]  ; do 
 	sleep 1
 	vm-test-boot
@@ -109,7 +110,7 @@ function vm-wait-boot () {
     sleep ${SSHD_DELAY} #qemu guest agent comes up fast, so, wait 5 secs for ssh
 }
 function vm-test-up () {
-    vms_up=0
+    local vms_up=0
     for i in  ${vm_names} ; do 
 	virsh list --state-running --name | grep -q "$i"
 	if [[ $? -eq 0 ]] ; then   #grep returns 0 on match
@@ -124,7 +125,7 @@ function vm-test-up () {
 function vm-wait-shutdown () {
     echo "Waiting:    VMs: ${vm_names}"
     vm-test-up
-    up=$?
+    local up=$?
     while [[ ${up} -gt 0 ]]  ; do 
 	sleep 1
 	vm-test-up
