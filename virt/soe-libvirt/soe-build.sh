@@ -15,9 +15,9 @@ scriptname="soe-build.sh"
 TOOL_DIR="/data-ssd/data/development/src/github/ansible-soe/virt"
 soe_vm_control_script="${TOOL_DIR}/soe-libvirt/soe-vm-control.sh"
 scriptname="soe-build.sh"
-domain="soe.vorpal"     #vm "domain" to use when creating vms
+domain="soe.vorpal"                                 #vm "domain" to use when creating vms
 source "${TOOL_DIR}/soe-ansible/soe-ansible.sh"     #source functions to run our ansible soe playbooks
-SSHD_DELAY=15           #extra delay to wait for ssh.
+SSHD_DELAY=15                                       #extra delay to wait for ssh.
 
 #vms to operate on:
 #def_vm_names="centos7 fedora ubuntu ubuntu_server temp foo bar"
@@ -183,8 +183,8 @@ function sequence-full () {
     echo "Running full sequence to: define, start, connect, install soe, shutdown, undefine:"
     vm-boot
     vm-wait-boot
-    vm-ansible-setup 
-    vm-ansible-run-soe
+    vm-ansible-setup    #defined in soe-ansible.sh
+    vm-ansible-run-soe  #defined in soe-ansible.sh
     vm-shutdown
 }
 function sequence-partial () {
@@ -200,8 +200,8 @@ function sequence-partial () {
     #virsh list --all
     #vm-wait-boot
 
-    #vm-ansible-setup 
-    #vm-ansible-run-soe
+    #vm-ansible-setup       #defined in soe-ansible.sh
+    #vm-ansible-run-soe     #defined in soe-ansible.sh
 
     #vm-shutdown
     #or:
