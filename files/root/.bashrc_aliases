@@ -13,6 +13,9 @@ alias mv='mv -i'
 
 alias binds="bind -P | grep 'can be'"
 alias h=history
+alias ht="history | tail -n"
+alias h20="history | tail -n 20"
+alias h100="history | tail -n 100"
 alias e=emacs
 
 alias ee="emacs ~/.emacs"              ; alias jj-ee="ee" 
@@ -109,6 +112,8 @@ alias jj-vm="virt-manager"
 alias jj-chrome="/usr/bin/google-chrome-stable --password-store=basic"
 alias jj-switch-dm="system-switch-displaymanager"
 alias jj-xdesk="startx -- -config xorg.desk.conf > xorg.desk.log 2>&1"
+
+alias jj-ssh-nohostcheck="ssh -X -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
 ############################################################################
 #Systemd:
@@ -224,6 +229,8 @@ alias jj-dpkg-list-all="dpkg-query --list"
 alias jj-dpkg-filesbypkg="dpkg -L"
 alias jj-dpkg-whatprovides="dpkg -S"
 
+alias jj-apt-upgrade-check="apt-get -u upgrade --assume-no"
+
 ############################################################################
 #Github
 
@@ -310,42 +317,53 @@ alias jj-docker-container-list-dead="docker ps -aq -f status=dead"
 alias jj-docker-container-list-created="docker ps -aq -f status=created"
 alias jj-docker-container-list-running="docker ps -aq -f status=running"
 alias jj-docker-container-clean="for i in `docker ps --all -q` ; do docker rm $i ; done"    #remove all leftover containers:
-alias jj-docker-container-restart="docker start -ai"
+alias jj-docker-container-restart="docker start"
+alias jj-docker-container-restart-interactive="docker start -ai"
+alias jj-docker-container-attach="docker attach"
+
+alias jj-docker-net="docker network create --driver bridge --subnet=192.168.130.0/24 docker-net"
+alias jj-docker-net-rm="docker network rm docker-net"
+alias jj-docker-stats="docker stats"   #vm_name
+
+function jj-docker-run-sshd () {
+    snapshot="${1}" ; shift
+    operation="run "
+    operation+=" --detach=true"
+    operation+=" --name fedora --hostname fedora"
+    operation+=" --net docker-net --ip 192.168.130.100"
+    operation+=" ${snapshot}"
+    operation+=" /usr/sbin/sshd -D"  #-D does not daemonise
+    docker ${operation} $@
+}
 
 function jj-docker-run-interactive () {
     snapshot="${1}" ; shift
-    #with dockerfile setting entrypoint bash, can get an interactive container with "-il":
-
-    #docker run --tty --interactive --name "fedora" "${snapshot}" /bin/bash
-    #docker run --tty --interactive --name "fedora" --hostname "fedora" "${snapshot}" /bin/bash $@
-    #docker run --tty --interactive --name "fedora" --hostname "fedora" --entrypoint="/bin/bash" "${snapshot}"  $@
-
-    #good, for entrypoint bash: 
-    #docker run --tty --interactive --name "fedora" --hostname "fedora" "${snapshot}" "-il" $@
-
-    #dumb-init: append /bin/bash for terminal:
-    docker run --tty --interactive --name "fedora" --hostname "fedora" "${snapshot}" /bin/bash $@
+    operation="run "
+    operation+=" --tty --interactive"
+    operation+=" --name fedora --hostname fedora"
+    operation+=" --net docker-net --ip 192.168.130.100"
+    operation+=" ${snapshot}"
+    #operation+=" --entrypoint=/bin/bash"
+    #operation+=" -il"       #with entrypoint bash, can get an interactive container with "-il"
+    operation+=" /bin/bash"  #dumb-init: append /bin/bash for terminal:
+    docker ${operation} $@
 }
 function jj-docker-run-interactive-rm () {
     snapshot="${1}" ; shift
-    #with dockerfile setting entrypoint bash, can get an interactive container with "-il":
-
-    #docker run --rm --tty --interactive --name "fedora" "${snapshot}" /bin/bash
-
-    #doen't need "-il"...
-    #docker run --rm --tty --interactive --name "fedora" --hostname "fedora" --entrypoint="/bin/bash" "${snapshot}" $@
-
-    #do need "-il", or it just runs fedora-run.sh as specified by entrypoint/cmd and exits
-    #docker run --rm --tty --interactive --name "fedora" --hostname "fedora" "${snapshot}" "-il" $@
-
-    #dumb-init:
-    docker run --rm --tty --interactive --name "fedora" --hostname "fedora" "${snapshot}" /bin/bash $@
+    operation="run "
+    operation+=" --rm "
+    operation+="--tty --interactive"
+    operation+=" --name fedora --hostname fedora"
+    operation+=" --net docker-net --ip 192.168.130.100"
+    operation+=" ${snapshot}"
+    #operation+=" --entrypoint=/bin/bash"
+    #operation+=" -il"       #with entrypoint bash, can get an interactive container with "-il"
+    operation+=" /bin/bash"  #dumb-init: append /bin/bash for terminal:
+    docker ${operation} $@
 }
 
 #tag images:
 #docker tag soe.vorpal_fedora soe.vorpal_fedora:01
-
-
 
 #docker machine:
 alias jj-docker-vmcreate="docker-machine create --driver virtualbox"     #myvm1
