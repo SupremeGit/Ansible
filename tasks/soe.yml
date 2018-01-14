@@ -136,7 +136,7 @@
     permanent: true
     state: enabled
   when: not ansible_os_family == "Debian"
-  tags: firewalld,nrpe,nagios-firewall-open
+  tags: firewalld,nrpe,nagios-firewall-open,docker-skip
 
 - name: Open Nagios nrpe plugin ufw firewall port.
   ufw:
@@ -145,7 +145,7 @@
     proto: tcp
     rule: allow
   when: ansible_os_family == "Debian"
-  tags: firewalld,nrpe,nagios-firewall-open
+  tags: firewalld,nrpe,nagios-firewall-open,docker-skip
 
 - name: Open Collectd firewall port.
   firewalld:
@@ -153,7 +153,7 @@
     permanent: true
     state: enabled
   when: not ansible_os_family == "Debian"
-  tags: firewalld,collectd,collectd-firewall-open
+  tags: firewalld,collectd,collectd-firewall-open,docker-skip
 
 - name: Open Collectd ufw firewall port.
   ufw:
@@ -162,7 +162,7 @@
     proto: tcp
     rule: allow
   when: ansible_os_family == "Debian"
-  tags: firewalld,nrpe,nagios-firewall-open
+  tags: firewalld,nrpe,nagios-firewall-open,docker-skip
 
 
 ########################################################
@@ -204,7 +204,7 @@
     enabled: yes
     state: started
   when: not ansible_os_family == "Debian"
-  tags: nrpe,nrpe-enable
+  tags: nrpe,nrpe-enable,docker-skip
 
 #- name: Enable & start Nagios nrpe-ng.
 #  service:
@@ -220,20 +220,20 @@
     enabled: yes
     state: started
   when: ansible_os_family == "Debian"
-  tags: nrpe,nrpe-enable
+  tags: nrpe,nrpe-enable,docker-skip
 
 - name: Enable & start Collectd.
   service:
     name: collectd
     enabled: yes
     state: started
-  tags: collectd,collectd-enable
+  tags: collectd,collectd-enable,docker-skip
 
 - name: Dnf install/update Fedora 27 groups
   dnf: state=latest name={{ item }}
   with_items: "{{ key_soe_groups_list_f27 }}"
   when: ansible_os_family == "RedHat" and ansible_distribution == "Fedora" and ansible_distribution_major_version == '27'
-  tags: dnf-groups-f27
+  tags: dnf-groups-f27,docker-skip
   
 - name: "F27 Server - Enable LightDM"
   service:
@@ -241,7 +241,7 @@
     enabled: yes
     #state: started
   when: ansible_os_family == "RedHat" and ansible_distribution == "Fedora" and ansible_distribution_major_version == '27'
-  tags: f27-server
+  tags: f27-server,docker-skip
 
 
 - name: "F27 - check default targetl"
@@ -251,12 +251,12 @@
   #failed_when: 0 != 1
   changed_when: False
   register: runlevel
-  tags: f27-runlevel
+  tags: f27-runlevel,docker-skip
 
 - name: "F27 Server - set default target to graphical.target"
   command: systemctl set-default graphical.target
   when: ansible_os_family == "RedHat" and ansible_distribution == "Fedora" and ansible_distribution_major_version == '27' and runlevel.stdout != "graphical.target" 
-  tags: f27-server,f27-runlevel
+  tags: f27-server,f27-runlevel,docker-skip
 
 - name: "F27 - Check graphical currently active"
   command: systemctl is-active graphical.target
@@ -264,9 +264,9 @@
   failed_when: graphical.stdout != "active"
   register: graphical
   changed_when: False
-  tags: f27-server,f27-runlevel
+  tags: f27-server,f27-runlevel,docker-skip
 
 - name: "F27 - Switch to graphical runlevel"
   command: systemctl isolate graphical.target
   when: ansible_os_family == "RedHat" and ansible_distribution == "Fedora" and ansible_distribution_major_version == '27' and graphical.stdout != "active"
-  tags: f27-server,f27-runlevel
+  tags: f27-server,f27-runlevel,docker-skip

@@ -25,7 +25,7 @@
     permanent: true
     state: enabled
   when: not ansible_os_family == "Debian"
-  tags: firewalld,cockpit, cockpit-firewall-open
+  tags: firewalld,cockpit, cockpit-firewall-open,docker-skip
 
 - name: Open Cockpit ufw firewall port.
   ufw:
@@ -34,19 +34,19 @@
     proto: tcp
     rule: allow
   when: ansible_os_family == "Debian"
-  tags: firewalld,cockpit,cockpit-firewall-open
+  tags: firewalld,cockpit,cockpit-firewall-open,docker-skip
 
 - name: Enable Cockpit.
   service:
     name: cockpit
     enabled: yes
     #no need to start this, it is started on demand by cockpit.socket
-  tags: cockpit,cockpit-enable
+  tags: cockpit,cockpit-enable,docker-skip
 
 - name: Enable and start Cockpit.socket.
   service:
     name: cockpit.socket
     enabled: yes
     state: started
-  tags: cockpit,cockpit-enable
+  tags: cockpit,cockpit-enable,docker-skip
 

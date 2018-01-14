@@ -3,12 +3,12 @@
 - name: "Debian - remove firewalld"
   apt:	state=absent name=firewalld
   when: ansible_os_family == "Debian"
-  tags: firewalld,firewalld-enable
+  tags: firewalld,firewalld-enable,docker-skip
 
 - name: "Debian - install ufw firewall"
   apt:	state=latest name=ufw
   when: ansible_os_family == "Debian"
-  tags: firewalld,firewalld-enable
+  tags: firewalld,firewalld-enable,docker-skip
 
 ###########################replace ufw with firewalld on ubuntu:
 #can't switch from ufw to firewalld in ubuntu, as ansible firewalld module
@@ -21,17 +21,17 @@
 #    masked: yes
 #    state: stopped
 #  when: ansible_os_family == "Debian"
-#  tags: firewalld,firewalld-enable
+#  tags: firewalld,firewalld-enable,docker-skip
 
 #- name: "Debian - remove ufw firewall"
 #  apt:	state=absent name=ufw
 #  when: ansible_os_family == "Debian"
-#  tags: firewalld,firewalld-enable
+#  tags: firewalld,firewalld-enable,docker-skip
 
 #- name: "Debian - install firewalld"
 #  apt:	state=latest name=firewalld
 #  when: ansible_os_family == "Debian"
-#  tags: firewalld,firewalld-enable
+#  tags: firewalld,firewalld-enable,docker-skip
 
 
 ############################
@@ -44,7 +44,7 @@
     masked: no
     state: started
   when: ansible_os_family == "Debian"
-  tags: firewalld,firewalld-enable
+  tags: firewalld,firewalld-enable,docker-skip
 
 #- name: "Debian - enable firewalld"
 #  systemd:
@@ -53,7 +53,7 @@
 #    masked: no
 #    state: started
 #  when: ansible_os_family == "Debian"
-#  tags: firewalld,firewalld-enable
+#  tags: firewalld,firewalld-enable,docker-skip
 
 #Note:
 #firewalld must be running or we get errors when we try to add rules:
@@ -63,5 +63,5 @@
     enabled: yes
     state: started
   when: not ansible_os_family == "Debian"
-  tags: firewalld,firewalld-enable
+  tags: firewalld,firewalld-enable,docker-skip
 

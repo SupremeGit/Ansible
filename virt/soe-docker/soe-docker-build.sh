@@ -22,11 +22,17 @@ scriptname="soe-docker-build.sh"
 #  Use this script to build the base image (01) and update working & current tags.
 #  Run shell in container:
 #    Define:
-#      function docker-run-interactive () { snapshot="${1}" ; shift ; docker run --tty --interactive --name "fedora" --hostname "fedora" "${snapshot}" /bin/bash $@ ; }
+#      function docker-run-interactive () { snapshot="${1}" ; shift ; docker run --tty --interactive --name "fedora" --hostname "fedora" --net docker-net --ip 192.168.130.100 "${snapshot}" /bin/bash $@ ; }
 #      alias docker-container-restart="docker start -ai"
 #    Then you can:
 #    docker-run-interactive soe.vorpal_fedora:current
 #    docker-container-restart fedora
+#
+#Todo:
+#setup networks instead of usign manual aliases:
+#alias docker-net="docker network create --driver bridge --subnet=192.168.130.0/24 docker-net"
+#alias docker-net-rm="docker network rm docker-net"
+
 
 #Docker system config is at:
 #  config file: ~/.docker/config.json
@@ -37,7 +43,7 @@ scriptname="soe-docker-build.sh"
 #  available operations: create, define, undefine, define, reimage, refresh, start, destroy, save. restore, shutdown, reboot, reset
 TOOL_DIR="/data-ssd/data/development/src/github/ansible-soe/virt"
 soe_vm_control_script="${TOOL_DIR}/soe-docker/soe-docker-vm-control.sh"
-domain="soe.vorpal"       #vm "domain" to use when creating vms
+domain="docker.vorpal"       #vm "domain" to use when creating vms
 source "${TOOL_DIR}/soe-ansible/soe-ansible.sh"     #source functions to run our ansible soe playbooks
 SSHD_DELAY=15             #extra delay to wait for ssh.
 
@@ -148,34 +154,41 @@ function sequence-full () {
     echo "Running full sequence to: define, start, connect, install soe, shutdown, undefine:"
 
     #build image: 01:
-    soe-vm-control-vms "build"         #build and tag with "01"
+    soe-vm-control-vms "build"          #build and tag with "01"
     #soe-vm-control-vms "rebuild"       #rebuild (with --no-cache) and tag with "01"
 
-    soe-vm-control-vms "reimage"       #Set "working" image to "01" base os image
+    soe-vm-control-vms "reimage"        #Set "working" image to "01" base os image
     #soe-vm-control-vms "refresh"       #Set "working" image to "current" soe'd image.
-    soe-vm-control-vms "current"       #Update "current" soe'd image from "working" image.
-    
-    #soe-vm-control-vms "run"           #Use "working" image to run initial post-boot preparation script at /soe/scripts/vmname-run.sh
-    soe-vm-control-vms "soe"            #Run soe installation script at /soe/scripts/vmname-run-soe.sh in image: working, create: current
+    soe-vm-control-vms "run"            #Update "working" image by running initial post-boot preparation script at /soe/scripts/vmname-run.sh
+    soe-vm-control-vms "current"        #Update "current" soe'd image from "working" image.
+
+    #soe-vm-control-vms "soe"            #Run soe installation script at /soe/scripts/vmname-run-soe.sh in image: working, create: current
 }
 function sequence-partial () {
     echo "Running ad-hoc sequence of commands:"   #comment or uncomment as desired:
     #soe-vm-control-vms "status"
 
-    #soe-vm-control-vms "undefine"      #Wipes 01, working and current images.
+    #soe-vm-control-vms "undefine"       #Wipes 01, working and current images.
 
     #build image: 01:
-    #soe-vm-control-vms "build"         #build and tag with "01"
-    #soe-vm-control-vms "rebuild"       #rebuild (with --no-cache) and tag with "01"
+    #soe-vm-control-vms "build"          #build and tag with "01"
+    #soe-vm-control-vms "rebuild"        #rebuild (with --no-cache) and tag with "01"
 
     #Setup working image:
     soe-vm-control-vms "reimage"        #Set "working" image to "01" base os image
-    ###soe-vm-control-vms "refresh"       #Set "working" image to "current" soe'd image.
-    soe-vm-control-vms "current"        #Update "current" soe'd image from "working" image.
+    ###soe-vm-control-vms "refresh"      #Set "working" image to "current" soe'd image.
+    soe-vm-control-vms "run"            #Update "working" image by running initial post-boot preparation script at /soe/scripts/vmname-run.sh
+    #soe-vm-control-vms "current"        #Update "current" soe'd image from "working" image.
 
     #Test updates to run-soe script:
-    soe-vm-control-vms "soe-update"     #Update run-soe script in image: working"
-    soe-vm-control-vms "soe"            #Run soe installation script at /soe/scripts/vmname-run-soe.sh in image: working, create: current
+    #soe-vm-control-vms "soe-update"     #Update run-soe script in image: working"
+    #soe-vm-control-vms "soe"            #Run soe installation script at /soe/scripts/vmname-run-soe.sh in image: working, create: current
+    soe-vm-control-vms "sshd"            #Start container & run sshd in container made from image:working
+
+    vm-ansible-setup
+    vm-ansible-run-soe-docker            #runs the soe playbook but skips tasks tagged with docker-skip
+
+    soe-vm-control-vms "commit"         #stops running container, and commits to :current
 }
 function sequence-test () {
     echo "Running test sequence of commands:"   #comment or uncomment as desired:
@@ -190,8 +203,8 @@ msg_start
 
 #soe-vm-control-vms "undefine"      #Wipes working and current images.
 
-sequence-full                       #Put as much soe config as possible in Dockerfile, and build here. Past ops are cached so should be fast.
-#sequence-partial                   #Update & run soe script & other ad-hoc commands
+#sequence-full                       #Put as much soe config as possible in Dockerfile, and build here. Past ops are cached so should be fast.
+sequence-partial                   #Update & run soe script & other ad-hoc commands
 #sequence-test 
 
 #soe-vm-control-vms "create"         #Create container from image: working."

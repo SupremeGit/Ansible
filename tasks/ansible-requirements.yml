@@ -8,23 +8,25 @@
 #  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version > '7'
 #  tags: ansible_requirements,python2-dnf
 
-- name: Install python2-dnf (EL8+)
-  command: dnf --assumeyes install python2-dnf
+#sudo and rsync are needed in stripped-bare docker containers.
+
+- name: Install python2-dnf,sudo,rsync (EL8+)
+  command: dnf --assumeyes install python2-dnf sudo rsync
   when: ansible_os_family == 'RedHat' and ansible_distribution_major_version > '7'
   tags: ansible_requirements,python2-dnf
 
 - name: Install python2-dnf (Fedora)
-  command: dnf --assumeyes install python2-dnf
+  command: dnf --assumeyes install python2-dnf sudo rsync
   when: ansible_os_family == "RedHat" and ansible_distribution == "Fedora"
   tags: ansible_requirements,python2-dnf
   
 - name: Apt-get install python
-  command: apt-get --assume-yes install python
+  command: apt-get --assume-yes install python sudo rsync
   when: ansible_os_family == "Debian"
   tags: ansible_requirements,python
 
 - name: Apt-get install python-apt
-  command: apt-get --assume-yes install python-apt
+  command: apt-get --assume-yes install python-apt sudo rsync
   when: ansible_os_family == "Debian"
   tags: ansible_requirements,python-apt
 

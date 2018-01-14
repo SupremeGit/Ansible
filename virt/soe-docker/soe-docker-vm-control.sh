@@ -44,16 +44,15 @@ usage () {
     echo "      build              Build base image: 01."
     echo "      rebuild            Build fresh base image: 01 with --no-cache."
     echo "      create             Create container from image: working."
-    echo "      run                Run image: working. Container removed on exit."
+    echo "      run                Run post-build script in image: working. Produces updated image: working."
     echo "      soe                Run soe build script in image: working, creating image: current."
     echo "      soe-update         Update the soe build script in image: working."
+    echo "      sshd               Run sshd in container created from image: working."
     echo "      reimage            Set working image to base os image: 01"
     echo "      refresh            Set working image to image: current (soe'd image)."
     echo "      current            Update image: current (soe'd image) from image: working."
     echo "      undefine           Blat the working & current images. Keep the base 01 image."
-    echo "      loop               Run image: working. WIth active command under process monitor, eg: sshd"
-    #echo "      commit        Commit changes made to a new image."
-    #echo "      update        Update container's post-boot setup script /soe/scripts/vmname-run-soe.sh"
+    echo "      commit             Commit changes in a container to a new image."
     echo "      "
     echo "Todo:"
     echo
@@ -71,9 +70,9 @@ function process_args () {
             -h | help)        usage;;
             -d | --debug)     export debug=1; export DEBUG=echo ; echo -e "\nDebug mode on.";;
             #status | create | define | undefine | reimage | refresh | start | destroy | save | restore | shutdown | reboot | reset )
-            build | rebuild | create | run | soe | soe-update | reimage | refresh | current | undefine)      
+            build | rebuild | create | run | soe | soe-update | sshd | commit | reimage | refresh | current | undefine)      
 		              operation="${1}" ; echo -e "Executing operation: $1.";;
-	    --vm)             ok=1 ; vmname="$2"  ; echo "Operating on vms: ${vmnames}" ; shift ;;
+	    --vm)             ok=1 ; vmname="$2"  ; echo "Operating on vm: ${vmname}" ; shift ;;
 	    --domain)         domain="$2"  ; echo "Operating on domain: ${domain}" ; shift ;;
             *)                ok=0 ; echo "Unrecognised option." ;  usage ;;
 	esac;
@@ -127,26 +126,50 @@ function vm_build () {
     $DEBUG docker ${operation} ${tags} "${TEMPLATE_DIR}/${vmname}/"
 }
 function vm_run () {
-    #run default bootup cmd specified in Dockerfile "/soe/scripts/fedora-run.sh"
-    local operation="run"                 #leave old ocntainers around so we can examine fs etc.
-    operation+=" --rm"                    #--rm removes old containers after they exit
-    #operation+=" --detach"               #don't see output if we detach, but get container ID.
+    #run default bootup cmd specified in Dockerfile "/soe/scripts/${vmname}-run.sh"
     echo "Run ${vmname}:"
-    operation+=" --hostname ${vmname}"    #setting hostname here does not persist in container, only has effect in this run: 
-    #$DEBUG docker ${operation} -i -t "${domain}_${vmname}:02"  "bash" #run interactively with tty
-    #$DEBUG docker ${operation}       "${domain}_${vmname}:latest"     #don't use latest tag
-    #run default cmd script:
-    #$DEBUG docker ${operation}       "${domain}_${vmname}" 
+    local operation="run"                 #leave old ocntainers around so we can examine fs etc.
+    #operation+=" --rm"                   #--rm removes old containers after they exit
+    #operation+=" --detach"               #don't see output if we detach, but get container ID.
+    operation+=" --hostname ${vmname} --net docker-net --ip 192.168.130.100"    #setting hostname here does not persist in container, only has effect in this run: 
+
+    #operation+=" -i -t "${domain}_${vmname}:02"  "bash"    #run interactively with tty
+    #operation+=" ${domain}_${vmname}:latest"               #don't use latest tag
+
     #run specific images:
-    #$DEBUG docker ${operation}       "${domain}_${vmname}:current"    
-    $DEBUG docker ${operation}        "${domain}_${vmname}:working"    #build to work on
-    #$DEBUG docker ${operation}       "${domain}_${vmname}:01"         #01 is the image with base install/prep done.
+    #operation+=" ${domain}_${vmname}:current"    
+    operation+=" ${domain}_${vmname}:working"
+    #operation+="${domain}_${vmname}:01"         #01 is the image with base install/prep done.
+
+    operation+=" /soe/scripts/${vmname}-run.sh"  #comment this out to run default cmd script specified in dockerfile:
+    $DEBUG docker ${operation}
+
+    if [[ $? -eq 0 ]] ; then
+	#CID=$( docker ${operation} "${domain}_${vmname}:working" "/soe/scripts/${vmname}-run-soe.sh" )
+	#Capturing CID as above only works when using --detach. Without detach, it captures output. 
+	#
+	#Get last created container ID:
+	CID=$(docker ps --latest --quiet)
+	echo "New container ID=${CID}"
+
+	echo "Committing to ${domain}_${vmname}:temp"
+	docker commit "${CID}" ${domain}_${vmname}:temp
+	#remove container
+	echo "Removing container: ${CID}"
+	docker rm "${CID}"
+	docker rmi "${domain}_${vmname}:working"
+	echo "Tagging ${domain}_${vmname}:working= :temp"
+	docker tag "${domain}_${vmname}:temp" "${domain}_${vmname}:working"
+	docker rmi "${domain}_${vmname}:temp"
+    else
+	echo "Error running soe."
+    fi
 }
 function vm_run_soe () {
     #run ${vmname}-run-soe.sh
-    echo "Run soe build script on: working, produces: current: ${i}:"
+    echo "Run soe build script on: working, produces: current."
     local operation="run"                  #leave old ocntainers around so we can examine fs etc.
-    operation+=" --hostname ${vmname}"     #setting hostname here does not persist in container, only has effect in this run: 
+    operation+=" --hostname ${vmname} --net docker-net --ip 192.168.130.100 " #setting hostname here does not persist in container, only has effect in this run: 
     docker ${operation} "${domain}_${vmname}:working" "/soe/scripts/${vmname}-run-soe.sh"
     if [[ $? -eq 0 ]] ; then
 	#CID=$( docker ${operation} "${domain}_${vmname}:working" "/soe/scripts/${vmname}-run-soe.sh" )
@@ -157,7 +180,8 @@ function vm_run_soe () {
 	echo "New container ID=${CID}"
 	
 	docker rmi "${domain}_${vmname}:current"
-	docker commit "${CID}" soe.vorpal_fedora:current
+	echo "Committing to ${domain}_${vmname}:current"
+	docker commit "${CID}" ${domain}_${vmname}:current
 	
 	#remove container
 	echo "Removing container: ${CID}"
@@ -166,6 +190,31 @@ function vm_run_soe () {
 	echo "Error running soe."
     fi
 }
+function vm_sshd () {
+    #run sshd
+    echo "Run sshd in container launched from: working."
+    local operation="run "
+    operation+=" --detach=true"
+    operation+=" --name ${vmname} --hostname ${vmname}"
+    operation+=" --net docker-net --ip 192.168.130.100"
+    operation+=" --add-host il-duce:192.168.1.100"
+    #operation+=" --cpus=4"
+    #operation+=" --memory=1g"
+    operation+=" ${domain}_${vmname}:working"
+    operation+=" /usr/sbin/sshd -D"  #-D does not daemonise
+    echo docker ${operation} $@
+    docker ${operation} $@
+}
+function vm_commit () {
+    #commit container into image: current
+    echo "Commit container, produces: current."
+    docker stop "${vmname}"
+    docker rmi  "${domain}_${vmname}:current"
+    echo "Commiting to ${domain}_${vmname}:current"
+    docker commit "${vmname}" "${domain}_${vmname}:current"
+    docker rm "${vmname}"
+}
+
 function vm_soe_update () {
     echo "Update soe build script in image: working: ${vmname}:"
     local operation="run"                   #leave old ocntainers around so we can examine fs etc.
@@ -176,30 +225,25 @@ function vm_soe_update () {
     CID=$(docker ps --latest --quiet)
     echo "New container ID=${CID}"
     
-    #Copy files in/out of container
-    docker cp "${TOOL_DIR}/soe-docker/vm-docker.vorpal/fedora/scripts/${vmname}-run-soe.sh" ${CID}:/soe/scripts/${vmname}-run-soe.sh
-    #docker cp ${CID}:/root/fedora-run-soe.log.txt ./
+    #Copy files in/out of container:
+    #docker cp "${TOOL_DIR}/soe-docker/vm-docker.vorpal/${vmname}/scripts/${vmname}-run-soe.sh" ${CID}:/soe/scripts/${vmname}-run-soe.sh
+    #docker cp "${TOOL_DIR}/soe-docker/vm-docker.vorpal/${vmname}/scripts/*" ${CID}:/soe/scripts/
+    docker cp "${TOOL_DIR}/soe-docker/vm-docker.vorpal/${vmname}/scripts" ${CID}:/soe/
+    #docker cp ${CID}:/root/${vmname}-run-soe.log.txt ./
     
     #clean up:
     docker rmi ${domain}_${vmname}:working
+    echo "Committing to ${domain}_${vmname}:working"
     docker commit "${CID}" ${domain}_${vmname}:working
     
     #remove container
     echo "Removing container: ${CID}"
     docker rm "${CID}"
 }
-function vm_loop () {
-    #run some kind of process manager and stay active, eg runnning sshd:
-    local operation="run --rm"
-    echo "Loop ${vmname}:"
-    operation+=" --hostname ${vmname}"
-
-    #invoke script which should run process manager: monit or supervisord, and use it to manage ongoing processes like sshd
-    $DEBUG docker ${operation} "${domain}_${vmname}:loop"    "/soe/scripts/${vmname}-run-sshd.sh"  #run sshd under monit
-}
 function vm_set_current () {
     #tag our working image as our "current" soe'd image:
     docker rmi ${domain}_${vmname}:current
+    echo "Tagging: ${domain}_${vmname}:current = :working"
     docker tag "${domain}_${vmname}:working"  "${domain}_${vmname}:current"
 }
 function vm_undefine () {
@@ -225,13 +269,13 @@ case ${operation} in          #switches for this shell script begin with '--'
     run)              vm_run                ;; #run image: working, removes resulting container
     soe)              vm_run_soe            ;; #run ${vmname}-run-soe.sh in image: working
     soe-update)       vm_soe_update         ;; #update ${vmname}-run-soe.sh in image: working
+    sshd)             vm_sshd               ;; #run sshd in container
+    commit)           vm_commit             ;; #commit container to :current
 
     reimage)          vm_reimage            ;; #set working to 01
     refresh)          vm_refresh            ;; #set working from current
     current)          vm_set_current        ;; #update current from working
     undefine)         vm_undefine           ;; #blat working, current images
-
-    loop)             vm_loop               ;;
     *)                vm_op "${operation}"  ;; 
     #*)                ok=0 ; echo "Unrecognised option." ;  usage ;;
 esac;

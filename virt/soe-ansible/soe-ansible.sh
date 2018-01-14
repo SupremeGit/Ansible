@@ -15,7 +15,7 @@ function ansible-play-facts-off () { ansible-playbook ${vault} ${hostsfile} --ex
 
 #main playbook commmands:
 function ansible-connect        () { ansible-play-facts-off ${var_playbook_connect} --tags=connect-new-host                "$@" ; }
-function ansible-requirements   () { ansible-play-facts-off ${var_playbook_connect} --tags=ansible_requirements            "$@" ; }
+function ansible-requirements   () { ansible-play           ${var_playbook_connect} --tags=ansible_requirements            "$@" ; }
 function ansible-soe            () { ansible-play           ${var_playbook_soe}     --extra-vars "hostgroups=${hostgroup}" "$@" ; }
 
 function vm-ansible-setup () {
@@ -24,4 +24,7 @@ function vm-ansible-setup () {
 }
 function vm-ansible-run-soe () {
     echo "Running SOE deploymemt tasks: ${vm_fq_names}"       ; ansible-soe          --limit "${vm_fq_names}" "$@"
+}
+function vm-ansible-run-soe-docker () {
+    echo "Running SOE deploymemt tasks: ${vm_fq_names}"       ; ansible-soe          --limit "${vm_fq_names}" --skip-tags=docker-skip"$@"
 }

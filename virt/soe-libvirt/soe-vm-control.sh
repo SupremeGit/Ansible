@@ -22,10 +22,9 @@ KVM_DIR="/data-ssd/data/kvm"                       #main KVM dir (to copy images
 #Shouldn't have to change anything below here:
 LIBVIRT_DELAY=1;                                   #delay to avoid lame libvirt lockups
 VM_DIR="${KVM_DIR}/vm"                             #running vms go in ${VM_DIR}/${domain}
-IMAGE_DIR="${KVM_DIR}/images"                      #saved vms, refresh copies images freshly installed osfrom here
-
-#switch to creating new image:
-BLANK_IMAGE="${IMAGE_DIR}/25G.qcow2"               #blank, sparse image, small & quick to copy
+#IMAGE_DIR="${KVM_IMAGE_DIR}/images"               #saved vms, refresh copies images freshly installed os from here
+#IMAGE_DIR="/mnt/6Tb/Shared-6tb/data/kvm/images/soe.vorpal/vm01/"  #basic images
+IMAGE_DIR="/mnt/6Tb/Shared-6tb/data/kvm/images/soe.vorpal/vm02/"   #big stuff already installed, for quicker ansibling
 
 BALLS=Salty ; debug=0 ;  help=0 ; ok=1
 usage () {
@@ -127,6 +126,8 @@ function vm_xml_op () {
 }
 function vm_reimage () {
     $DEBUG cp --sparse=always -v "${BLANK_IMAGE}" "${VM_DIR}/${domain}/${vmname}.qcow2"
+    #BLANK_IMAGE="${IMAGE_DIR}/25G.qcow2"               #blank, sparse image, small & quick to copy
+    qemu-img create -f qcow2 "${VM_DIR}/${domain}/${vmname}.qcow2" 25G
 }
 function vm_refresh () {
     $DEBUG cp --sparse=always -v "${IMAGE_DIR}/${domain}/${vmname}-vm01.qcow2" "${VM_DIR}/${domain}/${vmname}.qcow2"

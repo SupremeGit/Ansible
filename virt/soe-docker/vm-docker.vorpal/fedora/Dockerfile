@@ -7,6 +7,23 @@ MAINTAINER \
 ENV DISTTAG=f27container FGC=f27 FBR=f27 Balls=Salty
 ADD fedora-27-x86_64-20171110.tar.xz /
 
+#########################################################
+# Install any needed packages specified in requirements.txt
+#RUN has 2 forms:
+#    RUN <command> (shell form, the command is run in a shell, which by default is /bin/sh -c on Linux or cmd /S /C on Windows)
+#    RUN ["executable", "param1", "param2"] (exec form)
+#The RUN instruction will execute any commands in a new layer on top of the current image and commit the results. 
+#The resulting committed image will be used for the next step in the Dockerfile.
+#RUN pip install --trusted-host pypi.python.org -r fedora-requirements.txt
+
+RUN dnf install --assumeyes net-tools hostname openssh-server monit dumb-init procps-ng less iputils iproute passwd python2-dnf sudo rsync
+
+#not really required:
+#lsof tigervnc-server
+
+######################################################### 
+#If dynamic ops above are cached, changing anything after this line should be fast:
+
 #Local workdir is set to dir the Dockerfile is in. So, eg: src path for ADD can be relative to this.
 #WORKDIR instruction sets the (remote) working directory for any RUN, CMD, ENTRYPOINT, COPY and ADD instructions that follow it in the Dockerfile.
 WORKDIR /soe
@@ -16,29 +33,13 @@ WORKDIR /soe
 ADD ./scripts/ ./scripts/
 ADD fedora-version.txt .
 
-# Install any needed packages specified in requirements.txt
-#RUN has 2 forms:
-#    RUN <command> (shell form, the command is run in a shell, which by default is /bin/sh -c on Linux or cmd /S /C on Windows)
-#    RUN ["executable", "param1", "param2"] (exec form)
-#The RUN instruction will execute any commands in a new layer on top of the current image and commit the results. 
-#The resulting committed image will be used for the next step in the Dockerfile.
-#
-#RUN pip install --trusted-host pypi.python.org -r fedora-requirements.txt
-
-RUN sleep 10
-RUN dnf install --assumeyes net-tools
-RUN dnf install --assumeyes hostname
-RUN dnf install --assumeyes openssh-server
-RUN dnf install --assumeyes monit
-RUN dnf install --assumeyes dumb-init
-RUN dnf install --assumeyes procps-ng
-RUN dnf install --assumeyes less
-
-#RUN dnf install --assumeyes tigervnc-server
-
-
-# Make port 22 available to the world outside this container, and 2812 for monit status webpage:
-EXPOSE 22 2812
+# Make ports available to the world outside this container, and 
+#   22    :  sshd
+#   2812  :  monit status webpage:
+#   5666: :  nrpe
+#   9090  :  CockPit
+#   25826 :  collectd
+EXPOSE 22 2812 5666 9090 25826
 
 ##################################
 #Specify main entrypoint, or cmd:
@@ -81,7 +82,6 @@ EXPOSE 22 2812
 #CMD ["localhost"]
 
 #########################################################
-
 #Run dumb-init:
 # Runs "/usr/bin/dumb-init -- /my/script --with --args"
 #ENTRYPOINT ["/usr/bin/dumb-init", "--"]
@@ -91,7 +91,6 @@ ENTRYPOINT ["/usr/bin/dumb-init", "--single-child", "--"]
 #
 # or if you use --rewrite or other cli flags
 # ENTRYPOINT ["dumb-init", "--rewrite", "2:3", "--"]
-#
 
 #CMD ["/my/script", "--with", "--args"]
 #CMD ["/bin/bash", "-il"]
@@ -110,4 +109,3 @@ CMD ["/bin/bash"]
 #with entrypoint bash, can get an interactive container with:
 #docker run --tty --interactive --hostname "balls" soe.vorpal_fedora:current "-il"
 
-#########################################################

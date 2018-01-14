@@ -45,6 +45,9 @@ bustard.default.vorpal ansible_ssh_common_args='-o StrictHostKeyChecking=no -o U
 ubuntu.soe.vorpal  ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
 ubuntu_server.soe.vorpal  ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
 
+[docker]
+fedora.docker.vorpal ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
 [linux:children]
 f17
 f23
@@ -52,6 +55,7 @@ f27
 fedora-rawhide
 centos7
 soe
+docker
 ubuntu
 
 [vms]
