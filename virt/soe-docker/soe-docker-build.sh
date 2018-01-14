@@ -190,7 +190,7 @@ docker-containers-rm                     #and remove running containers
 sequence-ad-hoc                          #Run ad-hoc sequence, tweak as desired.
 
 soe-vm-control-vms "status"              #runtime stats of current vm's container
-soe-vm-control-vms "status_all"          #runtime stats of all containers
+#soe-vm-control-vms "status_all"         #runtime stats of all containers
 
 echo "Docker images:"; docker images     #Status: images
 docker-containers-ls                     #Status: containers

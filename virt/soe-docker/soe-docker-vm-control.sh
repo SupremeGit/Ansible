@@ -261,16 +261,37 @@ function vm_undefine () {
 function vm_status () {
     #get stats on a container (ie if we've launched one running sshd).
     myvmname="$1"
-    local operation="stats "
-    operation+=" --no-stream=true"
-    operation+=" --all=true"                  #show non-running containers
-    #operation+=" --format='table {{.ID}}'"   #ID is the long-format container ID. Too long.
+    #args=(combined.pdf "my file.pdf");
+    local operation=("stats")
+    operation+=("--no-stream=true")
+    operation+=("--all=true")                  #show non-running containers
+    #operation+=("--format='table {{.ID}}'")   #ID is the long-format container ID. Too long.
+
     #Bah. No way to stop docker mangling this! When passed to docker cmdline as part of a var, docker always splits after table, even through quotes!
+    #operation+=("--format")
+    #operation+=('"table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}\t{{.MemPerc}}\t{{.PIDs}}"')
+
     #dqt='"'  #doublequote.
-    #operation+=" --format=${dqt}table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}\t{{.MemPerc}}\t{{.PIDs}}${dqt}"
-    #echo ${operation}
+    #operation+=("--format=${dqt}table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}\t{{.MemPerc}}\t{{.PIDs}}${dqt}")
+
+    #operation+=('--format="table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}\t{{.MemPerc}}\t{{.PIDs}}"')
+    #operation+=("--format="'"'"table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}\t{{.MemPerc}}\t{{.PIDs}}"'"')
+
+    ##echo "${operation[@]}"
+    ##echo ${operation[@]}
+    #printf '%s\n' "${operation[@]}"  #nice, one line per array element
+
     #But it works when you pass directly on docker commandline. So stupid:
-    docker ${operation} --format="table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}\t{{.MemPerc}}\t{{.PIDs}}" ${myvmname}
+    #docker ${operation} --format="table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}\t{{.MemPerc}}\t{{.PIDs}}" ${myvmname}
+
+    #Even this fails, and even when -x shows it is passed to docker as a single-quoted unit with double-quotes intact:
+    #fmt='--format="table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}\t{{.MemPerc}}\t{{.PIDs}}"'
+    #I swear docker must not be parsing this commandline correctly
+
+    #Unbelievable. This gets it:
+    operation+=("--format")
+    fmt="table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}\t{{.MemPerc}}\t{{.PIDs}}"
+    docker "${operation[@]}" "${fmt}" ${myvmname}
 }
 function vm_status_all () {
     #get stats on all containers, even those that are not running
