@@ -9,7 +9,7 @@ Some ansible playbooks to setup a basic SOE on various linux distributions, curr
 The ansible playbooks currently perform the following tasks:
  * setup ssh keys and dependencies (python2-dnf, python-apt) for full ansible operation.
  * setup epel, Puppet, and (for Fedora) local repositories
- * install key apps: ssh server, git, strace, emacs, and monitoring/management
+ * install key apps, eg: ssh server, git, strace, emacs, and monitoring/management
  * setup monitoring & management via collectd, nagios nrpe plugin executor, CockPit management console (open firewall ports, configure & start services)
  * install bashrc, bashrc aliases, and .emacs configuration, for a less-painful sysadmin experience
  * for Fedora, install Xfce desktop group & set default systemd target to graphical (other distros will follow when I've setup local repos for them too, to speed this step up)
@@ -18,9 +18,9 @@ The ansible playbooks currently perform the following tasks:
 
 The virt subfolder contains several tools to test the ansible playbooks on supported distributions:
  * soe-libvirt: Templates & scripts using libvirt/virsh to test ansible playbooks on VMs.
-   * vm-template folder: contains a template libvirt xml file for creating VMs. To create a new VM, copy, then edit the VM name, description, and path to disk image.
+   * vm-template folder: contains a template libvirt xml file for creating VMs. To create a new VM: copy, then edit the VM name, description, and path to disk image.
    * vm-soe.vorpal: contains a set of 9 libvirt VM xml files (created from the template), describing 9 VMs I've setup with base OS installs (Fedora, CentOS, Ubuntu Desktop/Server)
-   * soe-vm-control.sh - interface to simplify virsh (libvirt) control of VMs. This script takes care of defining, undefining, starting, shutting down, & destroying VMs, and with manipulating VM image files so the playbooks can be repeatedly tested on fresh VM images.
+   * soe-vm-control.sh - interface to simplify virsh (libvirt) control of VMs.
    * soe-build.sh - uses the soe-vm-control script to manage multiple VMs, and sequence operations: define & boot up fresh vms, test the SOE playbooks on all VMs in parallel, then shutdown & undefine the VMs.
 
  * soe-docker:
