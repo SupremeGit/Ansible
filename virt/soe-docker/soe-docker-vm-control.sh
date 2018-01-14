@@ -5,7 +5,6 @@ scriptname="soe-docker-vm-control.sh"
 #By default,on launch, containers run the script specified in Dockerfile "/soe/scripts/fedora-run.sh"
 
 #DEBUG=echo 
-
 vmname="fedora"
 domain="docker.vorpal"
 
@@ -14,7 +13,7 @@ TOOL_DIR="/data-ssd/data/development/src/github/ansible-soe/virt"
 TEMPLATE_DIR="${TOOL_DIR}/soe-docker/vm-${domain}"
 KVM_DIR="/data-ssd/data/kvm"                       #main KVM dir (to copy images into)
 
-BALLS=Salty ; 
+#BALLS=Salty ; 
 debug=0 ;  help=0 ; ok=1
 usage () {
     echo
@@ -28,31 +27,35 @@ usage () {
     echo "      --domain  \"soe.vorpal\"          Domain name."
     echo
     echo "Available VMs:"
-    echo "               centos7          7.4"
-    echo "               fedora26"
+#    echo "               centos7          7.4"
+#    echo "               fedora26"
     echo "               fedora           27"
-    echo "               rawhide"
-    echo "               ubuntu           17.04 Desktop"
-    echo "               ubuntu_server    17.04 Server"
-    echo "               temp"
-    echo "               foo"
-    echo "               bar"
+#    echo "               rawhide"
+#    echo "               ubuntu           17.04 Desktop"
+#    echo "               ubuntu_server    17.04 Server"
+#    echo "               temp"
+#    echo "               foo"
+#    echo "               bar"
     echo
     echo "Operations:"
-    #echo "      status"
+    echo "      status             Status of container, including runtime stats."
+    echo "      status_all         Status of all containers, including runtime stats."
     echo
     echo "      build              Build base image: 01."
     echo "      rebuild            Build fresh base image: 01 with --no-cache."
     echo "      create             Create container from image: working."
     echo "      run                Run post-build script in image: working. Produces updated image: working."
+    echo
     echo "      soe                Run soe build script in image: working, creating image: current."
     echo "      soe-update         Update the soe build script in image: working."
+    echo
     echo "      sshd               Run sshd in container created from image: working."
+    echo "      commit             Commit changes in a container to a new image."
+    echo
     echo "      reimage            Set working image to base os image: 01"
     echo "      refresh            Set working image to image: current (soe'd image)."
     echo "      current            Update image: current (soe'd image) from image: working."
     echo "      undefine           Blat the working & current images. Keep the base 01 image."
-    echo "      commit             Commit changes in a container to a new image."
     echo "      "
     echo "Todo:"
     echo
@@ -69,8 +72,8 @@ function process_args () {
 	case ${1} in          #switches for this shell script begin with '--'
             -h | help)        usage;;
             -d | --debug)     export debug=1; export DEBUG=echo ; echo -e "\nDebug mode on.";;
-            #status | create | define | undefine | reimage | refresh | start | destroy | save | restore | shutdown | reboot | reset )
-            build | rebuild | create | run | soe | soe-update | sshd | commit | reimage | refresh | current | undefine)      
+            status | status_all | build | rebuild | create | run | soe | soe-update | \
+	    sshd | commit | reimage | refresh | current | undefine)      
 		              operation="${1}" ; echo -e "Executing operation: $1.";;
 	    --vm)             ok=1 ; vmname="$2"  ; echo "Operating on vm: ${vmname}" ; shift ;;
 	    --domain)         domain="$2"  ; echo "Operating on domain: ${domain}" ; shift ;;
@@ -82,6 +85,10 @@ function process_args () {
     if [ $ok -eq 0 ] ; then echo "Halp. Something isn't right with the command arguments. Exiting." ; usage ; fi
     echo
 }
+function set-x-on () {
+    set -x
+}
+
 #################
 
 function vm_op () {
@@ -251,24 +258,44 @@ function vm_undefine () {
     docker rmi --force ${domain}_${vmname}:working
     #docker rmi --force ${domain}_${vmname}:01       Always keep the base image.
 }
-
-function set-x-on () {
-    set -x
+function vm_status () {
+    #get stats on a container (ie if we've launched one running sshd).
+    myvmname="$1"
+    local operation="stats "
+    operation+=" --no-stream=true"
+    operation+=" --all=true"                  #show non-running containers
+    #operation+=" --format='table {{.ID}}'"   #ID is the long-format container ID. Too long.
+    #Bah. No way to stop docker mangling this! When passed to docker cmdline as part of a var, docker always splits after table, even through quotes!
+    #dqt='"'  #doublequote.
+    #operation+=" --format=${dqt}table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}\t{{.MemPerc}}\t{{.PIDs}}${dqt}"
+    #echo ${operation}
+    #But it works when you pass directly on docker commandline. So stupid:
+    docker ${operation} --format="table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}\t{{.MemPerc}}\t{{.PIDs}}" ${myvmname}
 }
-#set-x-on
-###########################################################
-#start here:
+function vm_status_all () {
+    #get stats on all containers, even those that are not running
+    vm_status ""                       #omitting container name will give stats on all.
+}
+
+########################################################### #start here:
+#set-x-on #debugging
 echo
 process_args "$@"
 
-case ${operation} in          #switches for this shell script begin with '--'
-    -h | help)        usage;;
-    create)           vm_create             ;; #create container from image "current"
+case ${operation} in #switches for this shell script begin with '--'
+    -h | --help)        usage;;
+
+    status)           vm_status ${vmname}   ;; #status & stats of container
+    status_all)       vm_status_all         ;; #status & stats of container
+
     build)            vm_build              ;; #build & tag with "01"
     rebuild)          vm_build_nocache      ;; #build & tag with "01", with --no-cache
+    create)           vm_create             ;; #create container from image "current"
+
     run)              vm_run                ;; #run image: working, removes resulting container
     soe)              vm_run_soe            ;; #run ${vmname}-run-soe.sh in image: working
     soe-update)       vm_soe_update         ;; #update ${vmname}-run-soe.sh in image: working
+
     sshd)             vm_sshd               ;; #run sshd in container
     commit)           vm_commit             ;; #commit container to :current
 
@@ -276,8 +303,8 @@ case ${operation} in          #switches for this shell script begin with '--'
     refresh)          vm_refresh            ;; #set working from current
     current)          vm_set_current        ;; #update current from working
     undefine)         vm_undefine           ;; #blat working, current images
-    *)                vm_op "${operation}"  ;; 
-    #*)                ok=0 ; echo "Unrecognised option." ;  usage ;;
-esac;
 
+    *)                vm_op "${operation}"  ;; 
+    #*)               ok=0 ; echo "Unrecognised option." ;  usage ;;
+esac;
 echo
