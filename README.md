@@ -15,7 +15,7 @@ The playbooks don't aim to produce anything like a fully finished SOE. It's more
 
 ## Functionality:
 The Ansible playbooks currently perform the following tasks:
- * setup ssh keys and ansible dependencies (python2-dnf, python-apt)
+ * setup ssh keys and Ansible dependencies (python2-dnf, python-apt)
  * setup extra repositories (e.g. epel, Puppet), and (for Fedora) local repositories to accelerate installs
  * install key apps, eg: git, emacs, Puppet (easy to add more)
  * configure monitoring & management: collectd, Nagios nrpe plugin executor, CockPit management console
@@ -27,11 +27,12 @@ The Ansible playbooks currently perform the following tasks:
 The virt subfolder contains several testing tools:
 
 ### Libvirt:
- * soe-libvirt: Templates & scripts using libvirt/virsh to test ansible playbooks on VMs:
-   * vm-template folder: contains a template libvirt VM xml file for creating VMs. To create a new VM: copy, then edit the VM name, description, and path to disk image
-   * vm-soe.vorpal: contains a set of 9 libvirt VM xml files (created from the template), describing 9 VMs I've setup with base OS installs (Fedora, CentOS, Ubuntu Desktop/Server)
-   * soe-vm-control.sh - interface to simplify virsh (libvirt) control of VMs
-   * soe-build.sh - uses the soe-vm-control script to manage multiple VMs, and sequence operations: define & boot up fresh vms, test SOE playbooks on all VMs in parallel, then shutdown & undefine the VMs.
+ * soe-libvirt: 
+   * Templates & scripts using libvirt/virsh to test ansible playbooks on VMs:
+     * vm-template folder: contains a template libvirt VM xml file for creating VMs. To create a new VM: copy, then edit the VM name, description, and path to disk image
+     * vm-soe.vorpal: contains a set of 9 libvirt VM xml files (created from the template), describing 9 VMs I've setup with base OS installs (Fedora, CentOS, Ubuntu Desktop/Server)
+     * soe-vm-control.sh - interface to simplify virsh (libvirt) control of VMs
+     * soe-build.sh - uses the soe-vm-control script to manage multiple VMs, and sequence operations: define & boot up fresh vms, test SOE playbooks on all VMs in parallel, then shutdown & undefine the VMs.
 
 ### Docker
  * soe-docker:
