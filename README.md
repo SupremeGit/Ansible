@@ -1,5 +1,5 @@
 # Ansible
-Some Ansible playbooks to setup a basic SOE on various linux distributions, 
+Some Ansible playbooks & tools to develop a basic SOE (standard operating environment). 
 
 ## Supported distributions: 
  * Fedora 26
@@ -9,8 +9,8 @@ Some Ansible playbooks to setup a basic SOE on various linux distributions,
 
 ## Goal:
 The playbooks don't aim to produce anything like a fully finished SOE. It's more intended as a foundation which:
- * sets up basic monitoring & configuration tools (eg Nagios, Collectd, CockPit, Puppet), to gain some visibility & control over machines
- * can be easily extented, either with more Ansible, or, if you prefer, Puppet
+ * sets up basic monitoring & configuration tools (eg Nagios, Collectd, CockPit, Puppet), to gain some initial visibility & control over machines
+ * can be easily extended, either with more Ansible, or, if you prefer, Puppet
  * provides tools to easily test any changes or additions you might like to make, vs any OS you might like to target.
 
 ## Functionality:
@@ -18,10 +18,10 @@ The Ansible playbooks currently perform the following tasks:
  * setup ssh keys and ansible dependencies (python2-dnf, python-apt)
  * setup extra repositories (e.g. epel, Puppet), and (for Fedora) local repositories to accelerate installs
  * install key apps, eg: git, emacs, Puppet (easy to add more)
- * configure monitoring & management: collectd, nagios nrpe plugin executor, CockPit management console
+ * configure monitoring & management: collectd, Nagios nrpe plugin executor, CockPit management console
  * install bashrc, bashrc aliases, and .emacs configuration, for a less-painful sysadmin experience
  * install Xfce desktop group & set default systemd target to graphical
- * install cronjob to periodically git pull a local Puppet repository & run Puppet to deploy updates. This cronjob is not currently enabled, but I intend to enable it when testing some Puppet.
+ * install cronjob to periodically git pull a local Puppet repository & run Puppet to deploy local updates. This cronjob is not currently enabled, but I intend to enable it when testing some Puppet.
 
 ## Testing:
 The virt subfolder contains several testing tools:
@@ -40,4 +40,5 @@ The virt subfolder contains several testing tools:
      * soe-docker-control.sh and soe-docker-build.sh - use Docker CLI to to build Docker images and sequence operations on images & containers
    * Currently only creates an image to test Fedora.
    
-### Vagrant support for Docker & VirtualBox will be coming at some point, but for now, the control & build scripts I've done are sufficient.
+### Vagrant
+ * Vagrant support for Docker & VirtualBox will be coming at some point, but for now, the control & build scripts I've done are sufficient.
