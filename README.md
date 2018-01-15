@@ -1,31 +1,42 @@
 # Ansible
+Some Ansible playbooks to setup a basic SOE on various linux distributions, 
 
-Some ansible playbooks to setup a basic SOE on various linux distributions, currently: 
+## Supported distributions: 
  * Fedora 26
  * Fedora (27) 
  * CentOS 7.4 
  * Ubuntu 17.04 desktop/server.
 
-The ansible playbooks currently perform the following tasks:
- * setup ssh keys and dependencies (python2-dnf, python-apt) for full ansible operation.
- * setup epel, Puppet, and (for Fedora) local repositories
- * install key apps, eg: ssh server, git, strace, emacs, and monitoring/management
- * setup monitoring & management via collectd, nagios nrpe plugin executor, CockPit management console (open firewall ports, configure & start services)
+## Goal:
+The playbooks don't aim to produce anything like a fully finished SOE. It's more intended as a foundation which:
+ * sets up basic monitoring & configuration tools (eg Nagios, Collectd, CockPit, Puppet), to gain some visibility & control over machines
+ * can be easily extented, either with more Ansible, or, if you prefer, Puppet
+ * provides tools to easily test any additions.
+
+## Functionality:
+The Ansible playbooks currently perform the following tasks:
+ * setup ssh keys and ansible dependencies (python2-dnf, python-apt)
+ * setup extra repositories (e.g. epel, Puppet), and (for Fedora) local repositories to accelerate installs
+ * install key apps, eg: git, emacs, Puppet (easy to add more)
+ * configure monitoring & management: collectd, nagios nrpe plugin executor, CockPit management console
  * install bashrc, bashrc aliases, and .emacs configuration, for a less-painful sysadmin experience
- * for Fedora, install Xfce desktop group & set default systemd target to graphical (other distros will follow when I've setup local repos for them too, to speed this step up)
+ * install Xfce desktop group & set default systemd target to graphical
  * install cronjob to periodically git pull a Puppet repository & run Puppet to deploy updates. This cronjob is not currently enabled, but I intend to enable it when testing some Puppet.
 
+## Testing:
+The virt subfolder contains several testing tools:
 
-The virt subfolder contains several tools to test the ansible playbooks on supported distributions:
- * soe-libvirt: Templates & scripts using libvirt/virsh to test ansible playbooks on VMs.
-   * vm-template folder: contains a template libvirt xml file for creating VMs. To create a new VM: copy, then edit the VM name, description, and path to disk image.
+### Libvirt:
+ * soe-libvirt: Templates & scripts using libvirt/virsh to test ansible playbooks on VMs:
+   * vm-template folder: contains a template libvirt VM xml file for creating VMs. To create a new VM: copy, then edit the VM name, description, and path to disk image
    * vm-soe.vorpal: contains a set of 9 libvirt VM xml files (created from the template), describing 9 VMs I've setup with base OS installs (Fedora, CentOS, Ubuntu Desktop/Server)
-   * soe-vm-control.sh - interface to simplify virsh (libvirt) control of VMs.
-   * soe-build.sh - uses the soe-vm-control script to manage multiple VMs, and sequence operations: define & boot up fresh vms, test the SOE playbooks on all VMs in parallel, then shutdown & undefine the VMs.
+   * soe-vm-control.sh - interface to simplify virsh (libvirt) control of VMs
+   * soe-build.sh - uses the soe-vm-control script to manage multiple VMs, and sequence operations: define & boot up fresh vms, test SOE playbooks on all VMs in parallel, then shutdown & undefine the VMs.
 
+### Docker
  * soe-docker:
    * Uses a similar scheme to soe-libvirt:
-     * vm-docker.vorpal folder with configuration (Dockerfile, docker-compose.yml, monit config, scripts) to build Docker images of targeted distributions.
-     * soe-docker-control.sh and soe-docker-build.sh - use Docker CLI to to build Docker images and sequence operations on images & containers.
-   * Currently only creates an image to test fedora. 
-   * Other distributions and Vagrant support will be added shortly.
+     * vm-docker.vorpal folder with configuration (Dockerfile, docker-compose.yml, monit config, scripts) to build Docker images of targeted distributions
+     * soe-docker-control.sh and soe-docker-build.sh - use Docker CLI to to build Docker images and sequence operations on images & containers
+   * Currently only creates an image to test fedora.
+ * Support for testing with Vagrant will be added shortly.
