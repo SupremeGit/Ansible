@@ -24,10 +24,10 @@ The Ansible playbooks currently perform the following tasks:
  * install cronjob to periodically git pull a local Puppet repository & run Puppet to deploy local updates. This cronjob is not currently enabled, but I intend to enable it when testing some Puppet.
 
 ## Testing:
-The virt subfolder contains several testing tools:
+The virt folder contains several testing tools:
 
 ### Libvirt:
- * soe-libvirt: 
+ * soe-libvirt folder: 
    * Templates & scripts using libvirt/virsh to test ansible playbooks on VMs:
      * vm-template folder: contains a template libvirt VM xml file for creating VMs. To create a new VM: copy, then edit the VM name, description, and path to disk image
      * vm-soe.vorpal: contains a set of 9 libvirt VM xml files (created from the template), describing 9 VMs I've setup with base OS installs (Fedora, CentOS, Ubuntu Desktop/Server)
@@ -35,7 +35,7 @@ The virt subfolder contains several testing tools:
      * soe-build.sh - uses the soe-vm-control script to manage multiple VMs, and sequence operations: define & boot up fresh vms, test SOE playbooks on all VMs in parallel, then shutdown & undefine the VMs.
 
 ### Docker 
- * soe-docker:
+ * soe-docker folder:
    * Many of the tasks in my Ansible playbooks are disabled for Docker containers (no-one wants Xfce in a container). But these scripts still make it easier to quickly develop & test new Ansible playbooks vs Docker images/containers.
    * Uses a similar scheme to soe-libvirt:
      * vm-docker.vorpal folder with configuration (Dockerfile, docker-compose.yml, monit config, scripts) to build Docker images of targeted distributions
