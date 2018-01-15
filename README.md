@@ -28,18 +28,21 @@ The virt folder contains several testing tools:
 
 ### Libvirt:
  * soe-libvirt folder: 
-   * Templates & scripts using libvirt/virsh to test ansible playbooks on VMs:
-     * vm-template folder: contains a template libvirt VM xml file for creating VMs. To create a new VM: copy, then edit the VM name, description, and path to disk image
-     * vm-soe.vorpal: contains a set of 9 libvirt VM xml files (created from the template), describing 9 VMs I've setup with base OS installs (Fedora, CentOS, Ubuntu Desktop/Server)
-     * soe-vm-control.sh - interface to simplify virsh (libvirt) control of VMs
-     * soe-build.sh - uses the soe-vm-control script to manage multiple VMs, and sequence operations: define & boot up fresh vms, test SOE playbooks on all VMs in parallel, then shutdown & undefine the VMs.
+   * Templates & scripts using libvirt/virsh to test Ansible playbooks on VMs:
+     * vm-template folder: contains a template libvirt VM xml file for creating VMs
+     * vm-soe.vorpal: contains a set of 9 libvirt VM xml files (created from the template), describing nine VMs I've setup with base OS installs (Fedora, CentOS, Ubuntu Desktop/Server)
+     * soe-vm-control.sh: interface to simplify virsh (libvirt) control of VMs
+     * soe-build.sh: uses the soe-vm-control script to manage multiple VMs, and sequence operations: 
+       * define & boot up fresh VMs
+       * test SOE playbooks on all VMs in parallel
+       * shutdown & undefine the VMs.
 
 ### Docker 
  * soe-docker folder:
    * Many of the tasks in my Ansible playbooks are disabled for Docker containers (no-one wants Xfce in a container). But these scripts still make it easier to quickly develop & test new Ansible playbooks vs Docker images/containers.
    * Uses a similar scheme to soe-libvirt:
      * vm-docker.vorpal folder with configuration (Dockerfile, docker-compose.yml, monit config, scripts) to build Docker images of targeted distributions
-     * soe-docker-control.sh and soe-docker-build.sh - use Docker CLI to to build Docker images and sequence operations on images & containers
+     * soe-docker-control.sh and soe-docker-build.sh - use Docker CLI to to build Docker images and sequence operations on images & containers.
    * Currently only creates an image to test playbooks vs Fedora. Not much effort would be required to adapt the Fedora Dockerfile to build images of other distributions.
 
 ### Vagrant
