@@ -8,10 +8,10 @@ Some Ansible playbooks & tools to develop a basic SOE (standard operating enviro
  * Ubuntu 17.04 desktop/server.
 
 ## Goal:
-The playbooks don't aim to produce anything like a fully finished SOE. It's more intended as a foundation which:
- * sets up basic monitoring & configuration tools (eg Nagios, Collectd, CockPit, Puppet), to gain some initial visibility & control over machines
- * can be easily extended, either with more Ansible, or, if you prefer, Puppet
- * provides tools to easily test any changes or additions you might like to make, vs any OS you might like to target.
+The playbooks don't aim to produce anything like a fully customised desktop SOE. It's more intended as a minimal SOE, suitable for servers or as a foundation which could be extended to provide a more customised desktop. Current goals are just to:
+ * set up basic monitoring & configuration tools (eg Nagios, Collectd, CockPit, Puppet), to gain some initial visibility & control over machines
+ * be easy to extend, either with more Ansible, or, if you prefer, Puppet
+ * provide tools to easily test any changes or additions you might like to make, vs any OS you might like to target.
 
 ## Functionality:
 The Ansible playbooks currently perform the following tasks:
@@ -34,12 +34,13 @@ The virt subfolder contains several testing tools:
      * soe-vm-control.sh - interface to simplify virsh (libvirt) control of VMs
      * soe-build.sh - uses the soe-vm-control script to manage multiple VMs, and sequence operations: define & boot up fresh vms, test SOE playbooks on all VMs in parallel, then shutdown & undefine the VMs.
 
-### Docker
+### Docker 
  * soe-docker:
+   * Many of the tasks in my Ansible playbooks are disabled for Docker containers (no-one wants Xfce in a container). But these scripts still make it easier to quickly develop & test new Ansible playbooks vs Docker images/containers.
    * Uses a similar scheme to soe-libvirt:
      * vm-docker.vorpal folder with configuration (Dockerfile, docker-compose.yml, monit config, scripts) to build Docker images of targeted distributions
      * soe-docker-control.sh and soe-docker-build.sh - use Docker CLI to to build Docker images and sequence operations on images & containers
-   * Currently only creates an image to test Fedora.
-   
+   * Currently only creates an image to test playbooks vs Fedora. Not much effort would be required to adapt the Fedora Dockerfile to build images of other distributions.
+
 ### Vagrant
  * Vagrant support for Docker & VirtualBox will be coming at some point, but for now, the control & build scripts I've done are sufficient.
